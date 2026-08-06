@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_allow"
+        android:orderInCategory="100"
+        android:title="@string/permission_manage_allow"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_ask"
+        android:orderInCategory="100"
+        android:title="@string/permission_manage_ask"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_do_not_allow"
+        android:orderInCategory="100"
+        android:title="@string/permission_manage_do_not_allow"
+        app:showAsAction="withText" />
+
+    <!-- Hide it by default -->
+    <item
+        android:id="@+id/action_group"
+        android:orderInCategory="100"
+        android:title="@string/permission_manage_group"
+        android:visible="false"
+        app:showAsAction="always" />
+
+</menu>

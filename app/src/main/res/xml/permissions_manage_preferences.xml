@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" >
+
+    <PreferenceCategory
+        android:key="allowed"
+        app:allowDividerBelow="false"
+        android:title="@string/permission_manage_allowed" >
+
+        <!-- To fill dynamically -->
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="ask"
+        app:allowDividerBelow="false"
+        android:title="@string/permission_manage_ask" >
+
+        <!-- To fill dynamically -->
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="not_allowed"
+        app:allowDividerBelow="false"
+        android:title="@string/permission_manage_not_allowed" >
+
+        <!-- To fill dynamically -->
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="follow_group"
+        app:allowDividerBelow="false"
+        android:title="@string/permission_manage_group" >
+
+        <!-- To fill dynamically -->
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="override_permissions"
+        android:title="@string/override_permissions" >
+
+        <Preference
+            android:key="override_runtime"
+            app:allowDividerBelow="true"
+            android:title="@string/runtime_permissions" />
+
+        <Preference
+            android:key="override_install"
+            app:allowDividerAbove="true"
+            app:allowDividerBelow="true"
+            android:title="@string/install_permissions" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

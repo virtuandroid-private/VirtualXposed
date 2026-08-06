@@ -1,0 +1,23 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    xmlns:tools="http://schemas.android.com/tools"
+4    package="org.chickenhook.restrictionbypass" >
+5
+6    <uses-sdk android:minSdkVersion="21" />
+7
+8    <application>
+8-->/home/b/virtu-android/virtualxposed-thesis-main/VirtualApp/restrictionbypass/src/main/AndroidManifest.xml:5:5-12:19
+9        <provider
+9-->/home/b/virtu-android/virtualxposed-thesis-main/VirtualApp/restrictionbypass/src/main/AndroidManifest.xml:6:9-11:20
+10            android:name="org.chickenhook.restrictionbypass.BypassProvider"
+10-->/home/b/virtu-android/virtualxposed-thesis-main/VirtualApp/restrictionbypass/src/main/AndroidManifest.xml:7:13-43
+11            android:authorities="${applicationId}.restrictionbypass"
+11-->/home/b/virtu-android/virtualxposed-thesis-main/VirtualApp/restrictionbypass/src/main/AndroidManifest.xml:8:13-69
+12            android:enabled="true"
+12-->/home/b/virtu-android/virtualxposed-thesis-main/VirtualApp/restrictionbypass/src/main/AndroidManifest.xml:9:13-35
+13            android:exported="false" >
+13-->/home/b/virtu-android/virtualxposed-thesis-main/VirtualApp/restrictionbypass/src/main/AndroidManifest.xml:10:13-37
+14        </provider>
+15    </application>
+16
+17</manifest>

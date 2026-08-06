@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="engine_process_name">:x</string>
+    <string name="virtual_installer">VirtualPackage Installer</string>
+    <string name="owner_name">Admin</string>
+    <string name="choose">Choose</string>
+    <string name="choose_empty">Chooser is Empty</string>
+    <string name="noApplications">No find applications</string>
+    <string name="add_account_button_label">Add account</string>
+    <string name="create_shortcut_already_exist">The shortcut already exists</string>
+    <string name="permission_manage_allow">Allow</string>
+    <string name="permission_manage_allow_all">Allow all</string>
+    <string name="permission_manage_allow_all_time">Allow all the time</string>
+    <string name="permission_manage_change_to_precise">Change to precise location</string>
+    <string name="permission_manage_while_using_app">While using the app</string>
+    <string name="permission_manage_only_once">Only this time</string>
+    <string name="permission_manage_do_not_allow">Don’t allow</string>
+    <string name="permission_manage_keep_approximate">Keep approximate location</string>
+    <string name="permission_request_dialog_message">
+        <![CDATA[Allow <b>%1$s</b> to use <b>%2$s</b> permission?]]>
+    </string>
+    <string name="permission_group_request_dialog_message">
+        <![CDATA[Allow <b>%1$s</b> to %2$s?]]>
+    </string>
+    <string name="coarse_location_permission_description">access this device’s approximate location</string>
+    <string name="fine_location_permission_description">access this device’s precise location</string>
+    <string name="location_change_request_dialog_message">
+        <![CDATA[Change <b>%1$s</b>’s location access from approximate to precise?]]>
+    </string>
+    <string name="host_permission_denied_dialog_title">Host permission denied</string>
+    <string name="host_permission_denied_dialog_message">
+        <![CDATA[%1$s is trying to request permission <b>%2$s</b>, but you need to grant it to <b>VirtualXposed</b> first]]>
+    </string>
+    <string name="host_permission_permanently_denied_dialog_message">
+        <![CDATA[Looks like permission <b>%1$s</b> has been denied and possibly cannot be requested anymore.
+            If you want to allow %2$s to use it you first need to grant it to <b>VirtualXposed</b>
+            in the settings]]>
+    </string>
+    <string name="go_to_settings">Go to settings</string>
+    <string name="host_permission_denied_do_not_show">Don’t show again</string>
+    <string name="alert_host_permission_denied_preference">
+        permissions_settings_show_host_permission_denied_alert
+    </string>
+</resources>

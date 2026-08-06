@@ -1,0 +1,41 @@
+#!/bin/bash
+# Gradle wrapper-wrapper
+# Ensure correct versions are used before invoking the actual Gradle wrapper
+
+set -e
+cd "$(dirname "$BASH_SOURCE")"
+
+# Java version needed to run gradlew
+java_version=1.8
+
+error () {
+  echo [build] $* >&2
+  return 1
+}
+
+# Set Java version for the specific Gradle version and set ANDROID_HOME, based on OS
+case "$(uname)" in
+  Darwin)
+    # Make JDK visible first (for Homebrew installations)
+    /usr/libexec/java_home -Fv $java_version &> /dev/null || {
+      version="$(ls "$(brew --prefix)/Cellar/openjdk@$java_version" | head -n 1)"
+      ln -sfn "$(brew --prefix)/Cellar/openjdk@$java_version/$version/libexec/openjdk.jdk" ~/Library/Java/JavaVirtualMachines/openjdk-$java_version.jdk
+    }
+    export JAVA_HOME="$(/usr/libexec/java_home -Fv $java_version 2> /dev/null)"
+
+    [[ -n "$ANDROID_HOME" ]] ||
+      export ANDROID_HOME="$HOME/Library/Android/sdk"
+    ;;
+  Linux)
+    export JAVA_HOME=/usr/lib/jvm/java-$java_version-openjdk
+    [[ -n "$ANDROID_HOME" ]] ||
+      export ANDROID_HOME="$HOME/Android/Sdk"
+    ;;
+  *) error OS not supported ;;
+esac
+
+[[ -d "$JAVA_HOME" ]] ||
+  error JDK not found, Java version $java_version is needed
+
+./gradlew -Pandroid.debug.obsoleteApi=true "${@:-assembleRelease}"
+[[ "$1" = clean ]] || ./gradlew publish
