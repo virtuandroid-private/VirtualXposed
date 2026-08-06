@@ -1,2 +1,2 @@
 ninja: Entering directory `/home/b/virtu-android/virtualxposed-thesis-main/VirtualApp/restrictionbypass/.cxx/Debug/1r3a1e5p/x86_64'
-ninja: no work to do.
+[1/1] Linking CXX shared library ../../../../build/intermediates/cxx/Debug/1r3a1e5p/obj/x86_64/libnrb.so

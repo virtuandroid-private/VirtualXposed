@@ -47,7 +47,7 @@
             android:theme="@style/TransparentTheme" />
 
         <activity
-            android:name=".settings.AboutActivity"
+            android:name=".compose.ui.AboutActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
 

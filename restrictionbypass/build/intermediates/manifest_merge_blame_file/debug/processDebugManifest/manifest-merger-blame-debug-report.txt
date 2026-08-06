@@ -4,6 +4,8 @@
 4    package="org.chickenhook.restrictionbypass" >
 5
 6    <uses-sdk android:minSdkVersion="21" />
+6-->INJECTED
+6-->INJECTED
 7
 8    <application>
 8-->/home/b/virtu-android/virtualxposed-thesis-main/VirtualApp/restrictionbypass/src/main/AndroidManifest.xml:5:5-12:19

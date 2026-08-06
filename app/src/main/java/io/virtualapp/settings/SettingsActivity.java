@@ -17,6 +17,7 @@ import com.lody.virtual.client.ipc.VActivityManager;
 import io.virtualapp.R;
 import io.virtualapp.VCommends;
 import io.virtualapp.abs.ui.VActivity;
+import io.virtualapp.compose.ui.AboutActivity;
 import io.virtualapp.home.ListAppActivity;
 import io.virtualapp.utils.Misc;
 
