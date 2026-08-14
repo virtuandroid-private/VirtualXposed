@@ -2,11 +2,11 @@ apply plugin: 'com.android.library'
 
 android {
     namespace 'me.weishu.epic'
-    compileSdkVersion 35
+    compileSdkVersion 37
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 35
+        targetSdkVersion 37
         versionCode 1
         versionName "1.0"
 

@@ -60,7 +60,6 @@ class AboutActivity : ComponentActivity() {
 fun AboutScreen() {
     val context = LocalContext.current
 
-    // State for "Thanks" dialog
     var showThanksDialog by remember { mutableStateOf(false) }
 
     // Resolve version name safely
@@ -68,7 +67,7 @@ fun AboutScreen() {
         try {
             val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
             packageInfo.versionName ?: "unknown"
-        } catch (e: PackageManager.NameNotFoundException) {
+        } catch (_: PackageManager.NameNotFoundException) {
             "unknown"
         }
     }
@@ -111,16 +110,6 @@ fun AboutScreen() {
                 )
             }
 
-            // Check Update
-//            item {
-//                AboutListItem(
-//                    title = stringResource(id = R.string.check_update),
-//                    onClick = {
-//                        VAVersionService.checkUpdateImmediately(context.applicationContext, true)
-//                    }
-//                )
-//            }
-
             // Thanks Dialog Trigger
             item {
                 AboutListItem(
@@ -139,16 +128,6 @@ fun AboutScreen() {
                     }
                 )
             }
-
-            // Website
-//            item {
-//                AboutListItem(
-//                    title = stringResource(id = R.string.about_website_title),
-//                    onClick = {
-//                        openUrl(context, "http://vxposed.com")
-//                    }
-//                )
-//            }
 
             item {
                 AboutListItem(

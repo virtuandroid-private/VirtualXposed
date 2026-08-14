@@ -73,6 +73,7 @@ public class LibCoreStub extends MethodInvocationProxy<MethodInvocationStub<Obje
             String path = (String) args[0];
             if(VirtualRuntime.getInitialPackageName() != null) {
                 PathChecker checker = PathChecker.get();
+                // TODO FIX EPIC LIB LOAD for XPOSED
                 if(checker.isPathValid(path)) {
                     VLog.d(TAG, "File access GRANTED to " + VirtualRuntime.getInitialPackageName() + ": " + path);
                     return method.invoke(who, args);

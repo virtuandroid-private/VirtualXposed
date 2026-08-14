@@ -333,6 +333,7 @@ public final class VClientImpl extends IVClient.Stub {
             applicationInfo.splitNames = new String[1];
         }
 
+        // TODO XPOSED NOT WORKING ON A17
         if (!DeviceUtil.isX86_64()) {
             boolean enableXposed = VirtualCore.get().isXposedEnabled();
             if (enableXposed) {

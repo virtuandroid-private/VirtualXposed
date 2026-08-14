@@ -69,6 +69,12 @@ public class ActivityManagerStub extends MethodInvocationProxy<MethodInvocationS
     @Override
     protected void onBindMethods() {
         super.onBindMethods();
+//        if (Build.VERSION.SDK_INT >= 37) {
+//            addMethodProxy(new RemoveContentProvider());
+//            addMethodProxy(new ReportOptimizationInfo());
+//            addMethodProxy(new GetContentProvider());
+//        }
+
         if (VirtualCore.get().isVAppProcess()) {
             addMethodProxy(new StaticMethodProxy("navigateUpTo") {
                 @Override
@@ -80,7 +86,6 @@ public class ActivityManagerStub extends MethodInvocationProxy<MethodInvocationS
             });
             addMethodProxy(new ReplaceLastUidMethodProxy("checkPermissionWithToken"));
             addMethodProxy(new isUserRunning());
-//            addMethodProxy(new RemoveContentProvider());
             addMethodProxy(new ResultStaticMethodProxy("updateConfiguration", 0));
             addMethodProxy(new ReplaceCallingPkgMethodProxy("setAppLockedVerifying"));
             addMethodProxy(new StaticMethodProxy("checkUriPermission") {
@@ -163,19 +168,45 @@ public class ActivityManagerStub extends MethodInvocationProxy<MethodInvocationS
         }
     }
 
+    private static class ReportOptimizationInfo extends MethodProxy {
+        @Override
+        public String getMethodName() {
+            return "reportOptimizationInfo";
+        }
 
-//    private static class RemoveContentProvider extends MethodProxy {
-//        @Override
-//        public String getMethodName() {
-//            return "removeContentProvider";
-//        }
-//
-//        @Override
-//        public Object call(Object who, Method method, Object[] args) throws Throwable {
-//            long origId = Binder.clearCallingIdentity();
-//            args[0] = origId;
-//            return super.call(who, method, args);
-//        }
-//    }
+        @Override
+        public Object call(Object who, Method method, Object[] args) throws Throwable {
+            System.out.println("PRINT reportOptimizationInfo");
+            return null;
+        }
+    }
+
+
+    private static class RemoveContentProvider extends MethodProxy {
+        @Override
+        public String getMethodName() {
+            return "removeContentProvider";
+        }
+
+        @Override
+        public Object call(Object who, Method method, Object[] args) throws Throwable {
+            System.out.println("PRINT CONTENT PROVIDER");
+            return null;
+        }
+    }
+
+
+    private static class GetContentProvider extends MethodProxy {
+        @Override
+        public String getMethodName() {
+            return "getContentProvider";
+        }
+
+        @Override
+        public Object call(Object who, Method method, Object[] args) throws Throwable {
+            System.out.println("PRINT getContentProvider");
+            return null;
+        }
+    }
 
 }

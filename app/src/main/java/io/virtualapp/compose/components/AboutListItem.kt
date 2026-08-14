@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun AboutListItem(
     title: String,
+    subtitle: String? = null,
     onClick: (() -> Unit)? = null
 ) {
     Column {
@@ -31,6 +32,14 @@ fun AboutListItem(
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface
             )
+
+            if (subtitle != null) {
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
         }
         HorizontalDivider(modifier = Modifier.padding(start = 16.dp))
     }

@@ -6,6 +6,8 @@ import android.util.Log;
 import com.lody.virtual.client.hook.utils.MethodParameterUtils;
 import com.lody.virtual.helper.utils.VLog;
 
+import org.chickenhook.restrictionbypass.BuildConfig;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -187,11 +189,14 @@ public class MethodInvocationStub<T> {
                     res = methodProxy.call(mBaseInterface, method, args);
                     res = methodProxy.afterCall(mBaseInterface, method, args, res);
                 } else {
-//                    try {
-//                        System.out.println("Not hooked " + mBaseInterface + " method: " + method.getName() + " ARGS: " + Arrays.toString(args));
-//                    } catch (Exception e) {
-//                        System.out.println("Fallback not hooked " + mBaseInterface + " method: " + method.getName());
-//                    }
+                    if (BuildConfig.DEBUG) {
+                        try {
+                            System.out.println("Not hooked " + mBaseInterface + " method: " + method.getName() + " Arguments: " + Arrays.toString(args));
+                        } catch (Exception e) {
+                            System.out.println("Fallback not hooked " + mBaseInterface + " method: " + method.getName());
+                        }
+                    }
+
                     res = method.invoke(mBaseInterface, args);
                 }
                 return res;

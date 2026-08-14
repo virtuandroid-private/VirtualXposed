@@ -177,6 +177,14 @@ public class NativeEngine {
 
     public static int onGetCallingUid(int originUid) {
         int callingPid = Binder.getCallingPid();
+
+        // Sidestep ApplicationThread.onTransact security issues
+        if (Build.VERSION.SDK_INT >= 37) {
+            if (callingPid == Process.ROOT_UID) {
+                return Process.SHELL_UID;
+            }
+        }
+
         if (callingPid == Process.myPid()) {
             return VClientImpl.get().getVUid();
         }
