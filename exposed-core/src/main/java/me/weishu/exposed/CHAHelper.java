@@ -8,8 +8,8 @@ import android.util.Log;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 
-import de.robv.android.xposed.DexposedBridge;
 import de.robv.android.xposed.ExposedHelper;
+import de.robv.android.xposed.LSPosedBridge;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
@@ -59,17 +59,18 @@ public final class CHAHelper {
     }
 
     static XC_MethodHook.Unhook replaceForCHA(Member member, final XC_MethodHook callback) {
-
         if (member.getDeclaringClass() == Application.class && "attach".equals(member.getName())) {
             XposedBridge.log("replace Application.attach with ContextWrapper.attachBaseContext for CHA");
             Method m = XposedHelpers.findMethodExact(ContextWrapper.class, "attachBaseContext", Context.class);
-            return DexposedBridge.hookMethod(m, new ApplicationHookProxy(callback));
+            return LSPosedBridge.INSTANCE.hookMethod(m, new ApplicationHookProxy(callback));
+//            return DexposedBridge.hookMethod(m, new ApplicationHookProxy(callback));
         }
 
         if (member.getDeclaringClass() == Application.class && "onCreate".equals(member.getName())) {
             XposedBridge.log("replace Application.onCreate with ContextWrapper.attachBaseContext for CHA");
             Method m = XposedHelpers.findMethodExact(ContextWrapper.class, "attachBaseContext", Context.class);
-            return DexposedBridge.hookMethod(m, new ApplicationHookProxy(callback));
+            return LSPosedBridge.INSTANCE.hookMethod(m, new ApplicationHookProxy(callback));
+//            return DexposedBridge.hookMethod(m, new ApplicationHookProxy(callback));
         }
 
         return null;

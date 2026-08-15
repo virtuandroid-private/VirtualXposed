@@ -1,0 +1,6 @@
+[submodule "external/lsplant"]
+	path = external/lsplant
+	url = https://github.com/JingMatrix/LSPlant.git
+[submodule "external/xz-embedded"]
+	path = external/xz-embedded
+	url = https://github.com/tukaani-project/xz-embedded.git

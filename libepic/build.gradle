@@ -48,5 +48,6 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':restrictionbypass')
+    implementation project(':lsplantbridge')
     api 'me.weishu.exposed:exposed-xposedapi:0.4.6'
 }

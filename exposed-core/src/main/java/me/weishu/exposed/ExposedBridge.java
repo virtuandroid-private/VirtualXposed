@@ -42,11 +42,11 @@ import java.util.Properties;
 import java.util.Set;
 
 import dalvik.system.DexClassLoader;
-import de.robv.android.xposed.DexposedBridge;
 import de.robv.android.xposed.ExposedHelper;
 import de.robv.android.xposed.IXposedHookInitPackageResources;
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.IXposedHookZygoteInit;
+import de.robv.android.xposed.LSPosedBridge;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedBridge;
@@ -113,7 +113,8 @@ public class ExposedBridge {
         appContext = context;
         initForPackage(context, applicationInfo);
 
-        ReLinker.loadLibrary(context, "epic");
+//        ReLinker.loadLibrary(context, "lsplantbridge");
+        System.loadLibrary("lsplantbridge");
         ExposedHelper.initSeLinux(applicationInfo.processName);
         XSharedPreferences.setPackageBaseDirectory(new File(applicationInfo.dataDir).getParentFile());
 
@@ -341,14 +342,15 @@ public class ExposedBridge {
             return ExposedHelper.newUnHook(callback, replaceUnhook.getHookedMethod());
         }
 
-        final XC_MethodHook.Unhook unhook = DexposedBridge.hookMethod(method, callback);
+//        final XC_MethodHook.Unhook unhook = DexposedBridge.hookMethod(method, callback);
+        final XC_MethodHook.Unhook unhook = LSPosedBridge.INSTANCE.hookMethod(method, callback);
         return ExposedHelper.newUnHook(callback, unhook.getHookedMethod());
     }
 
     public static Object invokeOriginalMethod(Member method, Object thisObject, Object[] args)
             throws NullPointerException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 
-        return DexposedBridge.invokeOriginalMethod(method, thisObject, args);
+        return LSPosedBridge.INSTANCE.invokeOriginalMethod(method, thisObject, args);
     }
 
 

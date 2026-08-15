@@ -334,7 +334,7 @@ public final class VClientImpl extends IVClient.Stub {
         }
 
         // TODO XPOSED NOT WORKING ON A17
-        if (!DeviceUtil.isX86_64()) {
+//        if (!DeviceUtil.isX86_64()) {
             boolean enableXposed = VirtualCore.get().isXposedEnabled();
             if (enableXposed) {
                 VLog.i(TAG, "Xposed is enabled.");
@@ -348,9 +348,9 @@ public final class VClientImpl extends IVClient.Stub {
             } else {
                 VLog.w(TAG, "Xposed is not enabled");
             }
-        } else {
-            VLog.e(TAG, "Xposed is not supported on x86_64");
-        }
+//        } else {
+//            VLog.e(TAG, "Xposed is not supported on x86_64");
+//        }
 
         ClassLoader cl = LoadedApk.getClassLoader.call(data.info);
         if (BuildCompat.isS()) {

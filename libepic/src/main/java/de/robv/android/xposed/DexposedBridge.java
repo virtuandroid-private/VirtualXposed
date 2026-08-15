@@ -19,7 +19,6 @@
 
 package de.robv.android.xposed;
 
-import android.app.AndroidAppHelper;
 import android.os.Build;
 import android.util.Log;
 
@@ -42,6 +41,8 @@ import me.weishu.epic.art.Epic;
 import me.weishu.epic.art.method.ArtMethod;
 
 import org.chickenhook.restrictionbypass.Unseal;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static de.robv.android.xposed.XposedHelpers.getIntField;
 
@@ -120,9 +121,10 @@ public final class DexposedBridge {
 		if (newMethod) {
 			if (Runtime.isArt()) {
 				if (hookMethod instanceof Method) {
-					Epic.hookMethod(((Method) hookMethod));
+					LSPosedBridge.INSTANCE.hookMethod((Method) hookMethod, callback);
+//					Epic.hookMethod(((Method) hookMethod));
 				} else {
-					Epic.hookMethod(((Constructor) hookMethod));
+//					Epic.hookMethod(((Constructor) hookMethod));
 				}
 			} else {
 				Class<?> declaringClass = hookMethod.getDeclaringClass();
