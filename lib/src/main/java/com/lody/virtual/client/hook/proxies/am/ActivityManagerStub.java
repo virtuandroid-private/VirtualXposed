@@ -69,7 +69,7 @@ public class ActivityManagerStub extends MethodInvocationProxy<MethodInvocationS
     @Override
     protected void onBindMethods() {
         super.onBindMethods();
-//        if (Build.VERSION.SDK_INT >= 37) {
+//        if (Build.VERSION.SDK_INT >= 36) {
 //            addMethodProxy(new RemoveContentProvider());
 //            addMethodProxy(new ReportOptimizationInfo());
 //            addMethodProxy(new GetContentProvider());

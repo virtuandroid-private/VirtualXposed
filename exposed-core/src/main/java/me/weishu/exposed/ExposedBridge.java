@@ -106,7 +106,7 @@ public class ExposedBridge {
         IGNORED
     }
 
-	@SuppressWarnings("deprecation")
+    @SuppressWarnings("deprecation")
     public static void initOnce(Context context, ApplicationInfo applicationInfo, ClassLoader appClassLoader) {
         // SYSTEM_CLASSLOADER_INJECT = patchSystemClassLoader();
         XposedBridge.XPOSED_BRIDGE_VERSION = FAKE_XPOSED_VERSION;
@@ -248,7 +248,7 @@ public class ExposedBridge {
                     }
 
                     final Object moduleInstance = moduleClass.getDeclaredConstructor()
-                        .newInstance();
+                            .newInstance();
                     if (moduleInstance instanceof IXposedHookZygoteInit) {
                         ExposedHelper.callInitZygote(moduleApkPath, moduleInstance);
                     }
@@ -337,10 +337,10 @@ public class ExposedBridge {
 
         presetMethod(method);
 
-        XC_MethodHook.Unhook replaceUnhook = CHAHelper.replaceForCHA(method, callback);
-        if (replaceUnhook != null) {
-            return ExposedHelper.newUnHook(callback, replaceUnhook.getHookedMethod());
-        }
+//        XC_MethodHook.Unhook replaceUnhook = CHAHelper.replaceForCHA(method, callback);
+//        if (replaceUnhook != null) {
+//            return ExposedHelper.newUnHook(callback, replaceUnhook.getHookedMethod());
+//        }
 
 //        final XC_MethodHook.Unhook unhook = DexposedBridge.hookMethod(method, callback);
         final XC_MethodHook.Unhook unhook = LSPosedBridge.INSTANCE.hookMethod(method, callback);
@@ -352,7 +352,6 @@ public class ExposedBridge {
 
         return LSPosedBridge.INSTANCE.invokeOriginalMethod(method, thisObject, args);
     }
-
 
 
     private static void initForXposedModule(Context context, ApplicationInfo applicationInfo, ClassLoader appClassLoader) {
@@ -687,29 +686,36 @@ public class ExposedBridge {
      * @return is need check module
      */
     private static boolean loadModuleConfig(String rootDir, String processName) {
-
         if (lastModuleList != null && TextUtils.equals(lastModuleList.first, processName) && lastModuleList.second != null) {
-            // Log.d(TAG, "lastmodule valid, do not load config repeat");
+            Log.d(TAG, "lastmodule valid, do not load config repeat");
             return true; // xposed installer has config file, and has already loaded for this process, return.
         }
 
+
         // load modules
         final File xposedInstallerDir = new File(rootDir, XPOSED_INSTALL_PACKAGE);
-        // Log.d(TAG, "xposedInstaller Dir:" + xposedInstallerDir);
+
+        Log.d(TAG, "xposedInstaller Dir:" + xposedInstallerDir);
         if (!xposedInstallerDir.exists()) {
-            // Log.d(TAG, "XposedInstaller not installed, ignore.");
+            Log.d(TAG, "XposedInstaller not installed, ignore.");
             return false; // xposed installer not enabled, must load all.
         }
 
-        final File modiles = new File(xposedInstallerDir, "exposed_conf/modules.list");
-        // Log.d(TAG, "module file:" + modiles);
-        if (!modiles.exists()) {
+        final File modules = new File(xposedInstallerDir, "conf/modules.list");
+        Log.d(TAG, "module file:" + modules);
+        if (!modules.exists()) {
             Log.d(TAG, "xposed installer's modules not exist, ignore.");
+            try {
+                modules.getParentFile().mkdirs();
+                modules.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             return false; // xposed installer config file not exist, load all.
         }
         BufferedReader br = null;
         try {
-            br = new BufferedReader(new FileReader(modiles));
+            br = new BufferedReader(new FileReader(modules));
             String line = null;
             Set<String> moduleSet = new HashSet<>();
             while ((line = br.readLine()) != null) {

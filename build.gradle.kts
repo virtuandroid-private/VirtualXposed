@@ -40,5 +40,6 @@ allprojects {
         maven {
             url = uri("$rootDir/XposedBridge/build/repo")
         }
+        maven { url = uri("https://artifactory.appodeal.com/appodeal") }
     }
 }

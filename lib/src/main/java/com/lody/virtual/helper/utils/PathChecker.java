@@ -26,8 +26,10 @@ public final class PathChecker {
             "/data/user/^USER^/^HOST_PACKAGE^/virtual/data/user/^VIRTUAL_USER^/^VIRTUAL_PACKAGE^/*",    // Virtual app sandbox folder
             "/data/user/^USER^/^HOST_PACKAGE^/virtual/data/app/^VIRTUAL_PACKAGE^/*",                    // Virtual app installation folder
             "/data/user/^USER^/^HOST_PACKAGE^/virtual/data/user/^VIRTUAL_USER^/wifiMacAddress",
-            "/storage/emulated/^USER^/Android/data/^HOST_PACKAGE^/virtual/^VIRTUAL_USER^/^VIRTUAL_PACKAGE^/*"      // External storage
+            "/storage/emulated/^USER^/Android/data/^HOST_PACKAGE^/virtual/^VIRTUAL_USER^/^VIRTUAL_PACKAGE^/*",      // External storage
+            "/data/user/^USER^/^HOST_PACKAGE^/virtual/data/user/^VIRTUAL_USER^/de.robv.android.xposed.installer/conf/modules.list" // Xposed modules
     };
+    // /data/user_de/0/de.robv.android.xposed.installer/conf/modules.list
 
     @SuppressLint("SdCardPath")
     private static final String[] blacklist =  {

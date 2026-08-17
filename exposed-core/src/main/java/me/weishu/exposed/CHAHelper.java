@@ -32,9 +32,9 @@ public final class CHAHelper {
         @Override
         protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
             super.beforeHookedMethod(param);
-            if (param.thisObject == null) {
-                throw new IllegalArgumentException("can not use static method!!");
-            }
+//            if (param.thisObject == null) {
+//                 throw new IllegalArgumentException("can not use static method!!");
+//            }
 
             if (param.thisObject instanceof Application) {
                 ExposedHelper.beforeHookedMethod(this.original, param);
@@ -46,9 +46,9 @@ public final class CHAHelper {
         @Override
         protected void afterHookedMethod(MethodHookParam param) throws Throwable {
             super.afterHookedMethod(param);
-            if (param.thisObject == null) {
-                throw new IllegalArgumentException("can not use static method!!");
-            }
+//            if (param.thisObject == null) {
+//                 throw new IllegalArgumentException("can not use static method!!");
+//            }
 
             if (param.thisObject instanceof Application) {
                 ExposedHelper.afterHookedMethod(this.original, param);

@@ -63,7 +63,6 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     return JNI_VERSION_1_6;
 }
 
-// TODO Inline hooks? https://github.com/LSPosed/LSPlant/blob/master/test/src/main/jni/test.cpp
 
 extern "C"
 JNIEXPORT jobject JNICALL

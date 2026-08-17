@@ -106,7 +106,7 @@ int __android_log_print(int prio, const char *tag, const char *fmt, ...)
  * before using the other macros to change the tag.
  */
 #ifndef LOG_TAG
-#define LOG_TAG NULL
+#define LOG_TAG "SANDBOX"
 #endif
 
 // ---------------------------------------------------------------------

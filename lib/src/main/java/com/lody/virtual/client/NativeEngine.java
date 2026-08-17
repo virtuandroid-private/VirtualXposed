@@ -3,6 +3,7 @@ package com.lody.virtual.client;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Process;
+import android.util.Log;
 
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.env.VirtualRuntime;
@@ -144,12 +145,12 @@ public class NativeEngine {
 
     public static void enableIORedirect() {
         try {
-            String soPath = VirtualCore.get().getContext().getApplicationInfo().nativeLibraryDir + File.separator + "lib" + LIB_NAME + ".so";
-            if (!new File(soPath).exists()) {
-                throw new RuntimeException("io redirect failed.");
-            }
+//            String soPath = VirtualCore.get().getContext().getApplicationInfo().sourceDir + File.separator + "" + "lib" + LIB_NAME + ".so";
+//            if (!new File(soPath).exists()) {
+//                throw new RuntimeException("IO redirect failed, missing so library: " + soPath);
+//            }
             redirectDirectory(VESCAPE, "/");
-            nativeEnableIORedirect(soPath, Build.VERSION.SDK_INT, BuildCompat.getPreviewSDKInt());
+//            nativeEnableIORedirect(soPath, Build.VERSION.SDK_INT, BuildCompat.getPreviewSDKInt());
         } catch (Throwable e) {
             VLog.e(TAG, VLog.getStackTraceString(e));
         }

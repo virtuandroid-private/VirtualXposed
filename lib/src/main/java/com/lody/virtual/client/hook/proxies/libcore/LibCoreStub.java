@@ -8,7 +8,9 @@ import com.lody.virtual.client.hook.base.MethodProxy;
 import com.lody.virtual.client.hook.base.ReplaceUidMethodProxy;
 import com.lody.virtual.helper.utils.PathChecker;
 import com.lody.virtual.helper.utils.VLog;
+
 import java.lang.reflect.Method;
+
 import mirror.libcore.io.ForwardingOs;
 import mirror.libcore.io.Libcore;
 
@@ -19,6 +21,7 @@ import mirror.libcore.io.Libcore;
 public class LibCoreStub extends MethodInvocationProxy<MethodInvocationStub<Object>> {
 
     private static final String TAG = LibCoreStub.class.getSimpleName();
+
     public LibCoreStub() {
         super(new MethodInvocationStub<Object>(getOs()));
     }
@@ -56,7 +59,6 @@ public class LibCoreStub extends MethodInvocationProxy<MethodInvocationStub<Obje
     }
 
 
-
     /**
      * MethodProxy
      * Proxies the libcore.io.Os.open method, and checks at runtime whether the
@@ -71,10 +73,14 @@ public class LibCoreStub extends MethodInvocationProxy<MethodInvocationStub<Obje
         @Override
         public Object call(Object who, Method method, Object... args) throws Throwable {
             String path = (String) args[0];
-            if(VirtualRuntime.getInitialPackageName() != null) {
+            // TODO FIX WITH PROPER REDIRECTS FOR XPOSED
+            args[0] = ((String) args[0]).replace("/data/user_de/0/", "/data/user/0/io.va.exposed64/virtual/data/user/0/");
+
+            if (VirtualRuntime.getInitialPackageName() != null) {
                 PathChecker checker = PathChecker.get();
                 // TODO FIX EPIC LIB LOAD for XPOSED
-//                if(checker.isPathValid(path)) {
+                // TODO FIX LOAD MODULES
+//                if (checker.isPathValid(path) || path.endsWith("liblsplantbridge.so")) {
                     VLog.d(TAG, "File access GRANTED to " + VirtualRuntime.getInitialPackageName() + ": " + path);
                     return method.invoke(who, args);
 //                }
