@@ -1,0 +1,72 @@
+package com.virtualxposed.victim
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.virtualxposed.victim.ui.theme.VictimAppTheme
+import kotlin.random.Random
+
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+
+        val dataStore = this.dataStore
+
+        setContent {
+            VictimAppTheme {
+                val viewModel: MainViewModel = viewModel(factory = viewModelFactory {
+                    initializer {
+                        MainViewModel(dataStore)
+                    }
+                })
+
+                val state = viewModel.state.collectAsState()
+                viewModel.updateSecretData { current ->
+                    current ?: "${Random.nextInt(0, 1000)}"
+                }
+                StartScreen(state.value)
+            }
+        }
+    }
+}
+
+@Composable
+fun StartScreen(state: MainState, modifier: Modifier = Modifier) {
+    Scaffold { innerPadding ->
+        Box(
+            modifier = Modifier.padding(innerPadding).fillMaxSize(), Alignment.Center,
+        ) {
+            Text(
+                text = "Secret data: ${state.secretData}",
+                textAlign = TextAlign.Center,
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun GreetingPreview() {
+    VictimAppTheme {
+        StartScreen(MainState())
+    }
+}
