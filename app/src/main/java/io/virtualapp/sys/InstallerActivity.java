@@ -6,8 +6,10 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -301,8 +303,24 @@ public class InstallerActivity extends AppCompatActivity {
             tipsText = getResources().getString(R.string.install_package, label);
             rightString = getResources().getString(R.string.install);
         }
-
         final CharSequence apkName = label;
+
+        if (path.startsWith(this.getCacheDir().getAbsolutePath())) {
+            System.out.println("Installing from internal files (ADB), skipping user verification.");
+            VUiKit.defer().when(() -> {
+                return VirtualCore.get().installPackage(path, InstallStrategy.UPDATE_IF_EXIST);
+            }).done((res) -> {
+                Toast.makeText(this, getResources().getString(R.string.add_app_loading_complete, apkName), Toast.LENGTH_LONG).show();
+                LoadingActivity.launch(this, packageName, 0);
+                finish();
+            }).fail((res) -> {
+                res.printStackTrace();
+                Toast.makeText(this, getResources().getString(R.string.install_fail, res.getMessage())
+                        , Toast.LENGTH_LONG).show();
+            });
+            return;
+        }
+
         mTips.setText(tipsText);
         mLeft.setText(leftString);
         mRight.setText(rightString);
