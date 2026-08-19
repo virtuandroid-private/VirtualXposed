@@ -14,7 +14,7 @@ android {
         minSdk = 24
         targetSdk = 37
         versionCode = 1
-        versionName = "2.1"
+        versionName = "2.0.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -72,6 +72,9 @@ val pushApkToXposed = tasks.register<Exec>(
 ) {
     dependsOn(pushApkToTmp)
 
+    // We want to install to Xposed without popup dialog
+    // To do this safely we must "authenticate" as ADB.
+    // The best way of doing this is by simply pushing the APK into the app cache directory.
     commandLine(
         "adb", "shell", "run-as", virtualXposedPackage,
         "cp $tmpApkPath $internalApkPath",
@@ -116,5 +119,6 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
 
-    compileOnly("me.weishu.exposed:exposed-xposedapi:0.4.6")
+    compileOnly(libs.exposed.xposedapi)
+    compileOnly(libs.okhttp)
 }

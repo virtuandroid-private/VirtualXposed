@@ -201,7 +201,7 @@ public final class VClientImpl extends IVClient.Stub {
                     Collections.singletonList(intent)
             );
         } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 ArrayMap activities = ActivityThread.mActivities.get(ActivityThread.currentActivityThread.call((Object) null));
                 ActivityThread.handleNewIntent.call(VirtualCore.mainThread(), activities.get(data.token), Collections.singletonList(intent));
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -333,24 +333,19 @@ public final class VClientImpl extends IVClient.Stub {
             applicationInfo.splitNames = new String[1];
         }
 
-        // TODO XPOSED NOT WORKING ON A17
-//        if (!DeviceUtil.isX86_64()) {
-            boolean enableXposed = VirtualCore.get().isXposedEnabled();
-            if (enableXposed) {
-                VLog.i(TAG, "Xposed is enabled.");
-                ClassLoader originClassLoader = context.getClassLoader();
-                ExposedBridge.initOnce(context, data.appInfo, originClassLoader);
-                List<InstalledAppInfo> modules = VirtualCore.get().getInstalledApps(0);
-                for (InstalledAppInfo module : modules) {
-                    ExposedBridge.loadModule(module.apkPath, module.getOdexFile().getParent(), module.libPath,
-                            data.appInfo, originClassLoader);
-                }
-            } else {
-                VLog.w(TAG, "Xposed is not enabled");
+        boolean enableXposed = VirtualCore.get().isXposedEnabled();
+        if (enableXposed) {
+            VLog.i(TAG, "Xposed is enabled.");
+            ClassLoader originClassLoader = context.getClassLoader();
+            ExposedBridge.initOnce(context, data.appInfo, originClassLoader);
+            List<InstalledAppInfo> modules = VirtualCore.get().getInstalledApps(0);
+            for (InstalledAppInfo module : modules) {
+                ExposedBridge.loadModule(module.apkPath, module.getOdexFile().getParent(), module.libPath,
+                        data.appInfo, originClassLoader);
             }
-//        } else {
-//            VLog.e(TAG, "Xposed is not supported on x86_64");
-//        }
+        } else {
+            VLog.w(TAG, "Xposed is not enabled");
+        }
 
         ClassLoader cl = LoadedApk.getClassLoader.call(data.info);
         if (BuildCompat.isS()) {
@@ -359,7 +354,7 @@ public final class VClientImpl extends IVClient.Stub {
         }
 
         if (Build.VERSION.SDK_INT >= 30)
-            ApplicationConfig.setDefaultInstance.call(new Object[] { null });
+            ApplicationConfig.setDefaultInstance.call(new Object[]{null});
         mInitialApplication = LoadedApk.makeApplication.call(data.info, false, null);
 
         // ExposedBridge.patchAppClassLoader(context);
@@ -476,7 +471,7 @@ public final class VClientImpl extends IVClient.Stub {
         NativeEngine.redirectDirectory("/data/data/" + info.packageName, info.dataDir);
         NativeEngine.redirectDirectory("/data/user/0/" + info.packageName, info.dataDir);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            System.out.println("Redirecting user_de folder: " + "/data/user_de/0/" + info.packageName + " to: " +  info.dataDir);
+            System.out.println("Redirecting user_de folder: " + "/data/user_de/0/" + info.packageName + " to: " + info.dataDir);
             NativeEngine.redirectDirectory("/data/user_de/0/" + info.packageName, info.dataDir);
         }
         String libPath = VEnvironment.getAppLibDirectory(info.packageName).getAbsolutePath();

@@ -11,12 +11,12 @@ android {
     }
 
     buildFeatures {
+        buildConfig = true
         prefab = true
     }
 
     defaultConfig {
         minSdk = 21
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     compileOptions {

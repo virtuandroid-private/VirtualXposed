@@ -5,9 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -29,20 +27,15 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val dataStore = this.dataStore
-
         setContent {
             VictimAppTheme {
                 val viewModel: MainViewModel = viewModel(factory = viewModelFactory {
                     initializer {
-                        MainViewModel(dataStore)
+                        MainViewModel()
                     }
                 })
 
                 val state = viewModel.state.collectAsState()
-                viewModel.updateSecretData { current ->
-                    current ?: "${Random.nextInt(0, 1000)}"
-                }
                 StartScreen(state.value)
             }
         }
@@ -56,7 +49,7 @@ fun StartScreen(state: MainState, modifier: Modifier = Modifier) {
             modifier = Modifier.padding(innerPadding).fillMaxSize(), Alignment.Center,
         ) {
             Text(
-                text = "Secret data: ${state.secretData}",
+                text = "Data: ${state.data}",
                 textAlign = TextAlign.Center,
             )
         }

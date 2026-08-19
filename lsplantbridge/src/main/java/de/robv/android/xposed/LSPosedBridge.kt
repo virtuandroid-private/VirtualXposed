@@ -1,11 +1,9 @@
 package de.robv.android.xposed
 
-import android.app.Application
 import com.virtualxposed.lsplantbridge.LSPlantHelper
 import java.lang.reflect.Member
 import java.lang.reflect.Method
 import java.lang.reflect.Modifier
-import kotlin.reflect.jvm.jvmName
 
 object LSPosedBridge {
     val bridge = LSPlantHelper()
@@ -28,6 +26,10 @@ object LSPosedBridge {
         val hooker = bridge.hook(target) { oldMethod, args ->
             val params = XC_MethodHook.MethodHookParam()
 
+            // TODO Checks for:
+            // - Abstract classes
+            // - Hooking this code
+            // - Recursive hooks (Method.invoke, Constructor.newInstance, getClass)
             val isStatic = Modifier.isStatic(target.modifiers)
             val thisObject = if (isStatic) null else args[0]
             val actualArgs = if (isStatic) args else args.sliceArray(1 until args.size)
@@ -35,9 +37,12 @@ object LSPosedBridge {
             params.args = actualArgs
             params.method = oldMethod
             params.thisObject = thisObject
-
             runCatching {
                 callback.beforeHookedMethod(params)
+            }.onFailure { throwable ->
+                if (com.virtualxposed.lsplantbridge.BuildConfig.DEBUG) {
+                    throwable.printStackTrace()
+                }
             }
 
             if (params.returnEarly) {
@@ -58,6 +63,10 @@ object LSPosedBridge {
 
             runCatching {
                 callback.afterHookedMethod(params)
+            }.onFailure { throwable ->
+                if (com.virtualxposed.lsplantbridge.BuildConfig.DEBUG) {
+                    throwable.printStackTrace()
+                }
             }
 
             val finalResult = if (params.throwable != null) {

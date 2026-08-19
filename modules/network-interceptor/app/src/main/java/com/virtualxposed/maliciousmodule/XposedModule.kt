@@ -14,7 +14,6 @@ import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.XposedHelpers
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 
-// TODO maybe import okhttp instead of using findClass?
 class XposedModule : IXposedHookLoadPackage {
     companion object {
         private const val TAG = "NetworkHook"
@@ -56,14 +55,56 @@ class XposedModule : IXposedHookLoadPackage {
 
                 override fun afterHookedMethod(param: MethodHookParam?) {
                     val context = param?.args[0] as? Context ?: return
-                    hookOkHttp(context,params)
+                    hookOkHttp(context, params)
                     super.afterHookedMethod(param)
                 }
             }
         )
     }
 
-    private fun hookOkHttp(
+    fun hookOkHttp(context: Context, params: XC_LoadPackage.LoadPackageParam) {
+        logOkhttp(context, params)
+        redirectOkhttp(context, params)
+    }
+
+    private fun redirectOkhttp(
+        context: Context,
+        params: XC_LoadPackage.LoadPackageParam
+    ) {
+        try {
+            XposedHelpers.findAndHookMethod(
+                "okhttp3.OkHttpClient",
+                params.classLoader,
+                "newCall",
+                "okhttp3.Request",
+                object : XC_MethodHook() {
+                    @Throws(Throwable::class)
+                    override fun beforeHookedMethod(param: MethodHookParam) {
+                        val originalRequest = param.args[0] ?: return
+
+                        val oldUrl = "https://example.com"
+                        val newUrl = "https://pastebin.com/raw/NCcdHd53"
+
+                        val originalUrlObj = XposedHelpers.callMethod(originalRequest, "url")
+                        val originalUrl = originalUrlObj.toString()
+
+                        if (originalUrl.contains(oldUrl)) {
+                            val builder = XposedHelpers.callMethod(originalRequest, "newBuilder")
+                            XposedHelpers.callMethod(builder, "url", newUrl)
+                            val newRequest = XposedHelpers.callMethod(builder, "build")
+
+                            param.args[0] = newRequest
+                            log("Successfully rewrote URL from $originalUrl to $newUrl")
+                        }
+                    }
+                }
+            )
+        } catch (e: Throwable) {
+            log("Failed to redirect OkHttp in ${params.packageName}: ${e.message}")
+        }
+    }
+
+    private fun logOkhttp(
         context: Context,
         lpparam: XC_LoadPackage.LoadPackageParam
     ) {
@@ -74,14 +115,9 @@ class XposedModule : IXposedHookLoadPackage {
             )
 
             hookOkHttpExecute(context, realCall)
-            hookOkHttpEnqueue(context, realCall)
 
-            log("OkHttp hooks installed")
         } catch (t: Throwable) {
-            log(
-                "OkHttp not found in " +
-                        "${lpparam.packageName}: $t"
-            )
+            log("OkHttp not found in ${lpparam.packageName}: $t")
         }
     }
 
@@ -96,7 +132,7 @@ class XposedModule : IXposedHookLoadPackage {
                 override fun beforeHookedMethod(
                     param: MethodHookParam
                 ) {
-                    logOkHttpRequest(context,param.thisObject)
+                    logOkHttpRequest(context, param.thisObject)
                 }
 
                 override fun afterHookedMethod(
@@ -120,24 +156,6 @@ class XposedModule : IXposedHookLoadPackage {
         )
     }
 
-    private fun hookOkHttpEnqueue(
-        context: Context,
-        realCall: Class<*>
-    ) {
-        XposedHelpers.findAndHookMethod(
-            realCall,
-            "enqueue",
-            "okhttp3.Callback",
-            object : XC_MethodHook() {
-
-                override fun beforeHookedMethod(
-                    param: MethodHookParam
-                ) {
-                    logOkHttpRequest(context,param.thisObject)
-                }
-            }
-        )
-    }
 
     private fun logOkHttpRequest(
         context: Context,
