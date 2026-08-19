@@ -31,9 +31,9 @@ class XposedModule : IXposedHookLoadPackage {
         }
 
         private fun toast(context: Context, message: String) {
-            Handler(Looper.getMainLooper()).post {
-                Toast.makeText(context, "$TAG: $message", Toast.LENGTH_LONG).show()
-            }
+//            Handler(Looper.getMainLooper()).post {
+//                Toast.makeText(context, "$TAG: $message", Toast.LENGTH_LONG).show()
+//            }
         }
     }
 

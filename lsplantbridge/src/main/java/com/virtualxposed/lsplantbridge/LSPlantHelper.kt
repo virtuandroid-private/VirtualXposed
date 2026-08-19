@@ -15,6 +15,8 @@ class MethodHooker(
     private val originalCallback: (originalMethod: Method, args: Array<Any?>) -> Any?
 ) {
     private val TAG = "MethodHooker"
+
+    // TODO THIS CAN RETURN NULL WHEN DUPLICATE METHOD
     private external fun hookTarget(target: Member, callback: Method): Method
     private external fun unhookTarget(target: Member): Boolean
     lateinit var backup: Method

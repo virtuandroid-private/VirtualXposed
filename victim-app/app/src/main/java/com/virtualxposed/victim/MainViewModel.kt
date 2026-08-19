@@ -1,5 +1,6 @@
 package com.virtualxposed.victim
 
+import android.os.Build
 import androidx.compose.runtime.Immutable
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -16,10 +17,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import java.io.File
 
 @Immutable
 data class MainState(
     val data: String? = null,
+    val version: String? = null,
+    val fingerprint: String? = null
 )
 
 class MainViewModel : ViewModel() {
@@ -39,6 +43,14 @@ class MainViewModel : ViewModel() {
                     it.copy(data = data)
                 }
             }
+
+            _state.update {
+                it.copy(version = BuildConfig.VERSION_NAME)
+            }
+            _state.update {
+                it.copy(fingerprint = "${Build.FINGERPRINT}")
+            }
+
         }
     }
 }

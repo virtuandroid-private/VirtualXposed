@@ -4,17 +4,17 @@ plugins {
 }
 
 android {
-    namespace = "com.virtualxposed.maliciousmodule"
+    namespace = "com.virtualxposed.fingerprintspoofer"
     compileSdk {
         version = release(37)
     }
 
     defaultConfig {
-        applicationId = "com.virtualxposed.maliciousmodule"
+        applicationId = "com.virtualxposed.fingerprintspoofer"
         minSdk = 24
         targetSdk = 37
         versionCode = 1
-        versionName = "2.0.3"
+        versionName = "1.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -41,7 +41,6 @@ val virtualXposedPackage = "io.va.exposed64"
 val tmpApkPath = "/data/local/tmp/${project.name}.apk"
 val internalApkPath = "/data/user/0/$virtualXposedPackage/cache/${project.name}.apk"
 
-// TODO Move to gradle dependency?
 val restartXposed = tasks.register<Exec>(
     "restartXposed",
 ) {
