@@ -73,8 +73,6 @@ public class LibCoreStub extends MethodInvocationProxy<MethodInvocationStub<Obje
         @Override
         public Object call(Object who, Method method, Object... args) throws Throwable {
             String path = (String) args[0];
-            // TODO FIX WITH PROPER REDIRECTS FOR XPOSED
-            args[0] = ((String) args[0]).replace("/data/user_de/0/", "/data/user/0/io.va.exposed64/virtual/data/user/0/");
 
             if (VirtualRuntime.getInitialPackageName() != null) {
                 PathChecker checker = PathChecker.get();

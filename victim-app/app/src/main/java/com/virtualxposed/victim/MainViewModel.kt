@@ -23,7 +23,8 @@ import java.io.File
 data class MainState(
     val data: String? = null,
     val version: String? = null,
-    val fingerprint: String? = null
+    val fingerprint: String? = null,
+    val fileContent: String? = null
 )
 
 class MainViewModel : ViewModel() {
@@ -50,7 +51,20 @@ class MainViewModel : ViewModel() {
             _state.update {
                 it.copy(fingerprint = "${Build.FINGERPRINT}")
             }
+        }
+    }
 
+    fun createPrivateFile(directory: File) {
+        val privateFile = File(directory, "private-file")
+        directory.mkdirs()
+
+        if (!privateFile.exists()) {
+            privateFile.createNewFile()
+            privateFile.writeText("This is the contents of the private file.")
+        }
+
+        _state.update {
+            it.copy(fileContent = privateFile.readText())
         }
     }
 }

@@ -471,7 +471,6 @@ public final class VClientImpl extends IVClient.Stub {
         NativeEngine.redirectDirectory("/data/data/" + info.packageName, info.dataDir);
         NativeEngine.redirectDirectory("/data/user/0/" + info.packageName, info.dataDir);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            System.out.println("Redirecting user_de folder: " + "/data/user_de/0/" + info.packageName + " to: " + info.dataDir);
             NativeEngine.redirectDirectory("/data/user_de/0/" + info.packageName, info.dataDir);
         }
         String libPath = VEnvironment.getAppLibDirectory(info.packageName).getAbsolutePath();

@@ -80,6 +80,8 @@ public class NativeEngine {
     }
 
     public static void redirectDirectory(String origPath, String newPath) {
+        Log.d(TAG, "Redirect path: " + origPath + " to path: " + newPath);
+
         if (!origPath.endsWith("/")) {
             origPath = origPath + "/";
         }
@@ -120,6 +122,7 @@ public class NativeEngine {
     }
 
     public static void whitelist(String path, boolean directory) {
+        Log.d(TAG, "Whitelisted path: " + path);
         if (directory && !path.endsWith("/")) {
             path = path + "/";
         } else if (!directory && path.endsWith("/")) {
@@ -133,6 +136,8 @@ public class NativeEngine {
     }
 
     public static void forbid(String path) {
+        Log.d(TAG, "Forbid path: " + path);
+
         if (!path.endsWith("/")) {
             path = path + "/";
         }
@@ -145,12 +150,14 @@ public class NativeEngine {
 
     public static void enableIORedirect() {
         try {
-//            String soPath = VirtualCore.get().getContext().getApplicationInfo().sourceDir + File.separator + "" + "lib" + LIB_NAME + ".so";
-//            if (!new File(soPath).exists()) {
-//                throw new RuntimeException("IO redirect failed, missing so library: " + soPath);
-//            }
+            String sourceDir = VirtualCore.get().getContext().getApplicationInfo().nativeLibraryDir;
+            String libPath = File.separator + "lib" + LIB_NAME + ".so";
+            String soPath = sourceDir + libPath;
+            if (!new File(soPath).exists()) {
+                throw new RuntimeException("IO redirect failed, missing so library: " + soPath);
+            }
             redirectDirectory(VESCAPE, "/");
-//            nativeEnableIORedirect(soPath, Build.VERSION.SDK_INT, BuildCompat.getPreviewSDKInt());
+            nativeEnableIORedirect(soPath, Build.VERSION.SDK_INT, BuildCompat.getPreviewSDKInt());
         } catch (Throwable e) {
             VLog.e(TAG, VLog.getStackTraceString(e));
         }

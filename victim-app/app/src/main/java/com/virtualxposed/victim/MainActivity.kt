@@ -22,6 +22,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.virtualxposed.victim.ui.theme.VictimAppTheme
+import java.io.File
 
 
 class MainActivity : ComponentActivity() {
@@ -33,7 +34,10 @@ class MainActivity : ComponentActivity() {
             VictimAppTheme {
                 val viewModel: MainViewModel = viewModel(factory = viewModelFactory {
                     initializer {
-                        MainViewModel()
+                        MainViewModel().also {
+                            val privateDir = this@MainActivity.filesDir
+                            it.createPrivateFile(privateDir)
+                        }
                     }
                 })
 
@@ -67,6 +71,12 @@ fun StartScreen(state: MainState, modifier: Modifier = Modifier) {
                 Text(
                     text = "Fingerprint: ${state.fingerprint}",
                     Modifier.padding(10.dp)
+                )
+                Text(
+                    text = "Private file content: ${state.fileContent}",
+                    modifier = Modifier.padding(10.dp),
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 2,
                 )
             }
         }

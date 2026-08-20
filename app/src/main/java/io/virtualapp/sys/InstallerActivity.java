@@ -305,6 +305,7 @@ public class InstallerActivity extends AppCompatActivity {
         }
         final CharSequence apkName = label;
 
+        System.out.println("Installing apk from path: " + path);
         if (path.startsWith(this.getCacheDir().getAbsolutePath())) {
             System.out.println("Installing from internal files (ADB), skipping user verification.");
             VUiKit.defer().when(() -> {

@@ -31,6 +31,7 @@ android {
         targetSdk = 37
 
         ndk {
+            // TODO MORE ABI?
             abiFilters.addAll(setOf("arm64-v8a", "x86_64"))
         }
     }
@@ -56,6 +57,10 @@ android {
     buildFeatures {
         buildConfig = true
         compose = true
+    }
+
+    packaging {
+        jniLibs.useLegacyPackaging = true
     }
 }
 
