@@ -47,5 +47,5 @@ You can now open the project in Android studio to build the project, by clicking
 button using the **app** configuration. However, you can also build it manually using:
 
 ```sh
-./gradlew build
+./gradlew app:assembleDebug
 ```
