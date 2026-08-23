@@ -18,8 +18,6 @@ import android.view.AbsSavedState;
 import android.view.View;
 import android.widget.Toast;
 
-import com.getkeepsafe.relinker.ReLinker;
-
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
@@ -343,7 +341,7 @@ public class ExposedBridge {
 //        }
 
 //        final XC_MethodHook.Unhook unhook = DexposedBridge.hookMethod(method, callback);
-        final XC_MethodHook.Unhook unhook = LSPosedBridge.INSTANCE.hookMethod(method, callback);
+        final XC_MethodHook.Unhook unhook = LSPosedBridge.INSTANCE.createHook(method, callback);
         return ExposedHelper.newUnHook(callback, unhook.getHookedMethod());
     }
 

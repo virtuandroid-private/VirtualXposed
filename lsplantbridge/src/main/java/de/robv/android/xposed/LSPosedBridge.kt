@@ -2,27 +2,21 @@ package de.robv.android.xposed
 
 import com.virtualxposed.lsplantbridge.LSPlantHelper
 import java.lang.reflect.Member
-import java.lang.reflect.Method
 import java.lang.reflect.Modifier
 
 object LSPosedBridge {
     val bridge = LSPlantHelper()
 
-    fun hookMethod(target: Member, callback: XC_MethodHook): XC_MethodHook.Unhook {
+    fun createHook(target: Member, callback: XC_MethodHook): XC_MethodHook.Unhook {
         println("Hooking method with LSPosedBridge. Target is: $target")
-
-        return if (target is Method) {
-            hookMethod(target, callback)
-        } else {
-            callback.Unhook(target)
-        }
+        return hookMember(target, callback)
     }
 
     fun invokeOriginalMethod(method: Member, thisObject: Any?, args: Array<Any?>): Any? {
         return bridge.getOriginalMethod(method)?.invoke(thisObject, *args)
     }
 
-    private fun hookMethod(target: Method, callback: XC_MethodHook): XC_MethodHook.Unhook {
+    private fun hookMember(target: Member, callback: XC_MethodHook): XC_MethodHook.Unhook {
         val hooker = bridge.hook(target) { oldMethod, args ->
             val params = XC_MethodHook.MethodHookParam()
 
