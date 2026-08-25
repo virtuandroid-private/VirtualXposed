@@ -5,6 +5,10 @@
 #include <stdlib.h>
 #include <fb/include/fb/ALog.h>
 
+#ifdef __x86_64__
+#include <x86_64-linux-android/asm/unistd_64.h>
+#endif
+
 #ifdef __aarch64__
 #include "A64Inlinehook/And64InlineHook.hpp"
 #else
@@ -69,7 +73,7 @@ void IOUniformer::init_env_before_all() {
             add_replace_item(item_src, item_dst);
             i++;
         }
-        startUniformer(getenv("V_SO_PATH"),api_level, preview_api_level);
+        startUniformer(getenv("V_SO_PATH"), api_level, preview_api_level);
         iu_loaded = true;
     }
 }
@@ -81,16 +85,17 @@ hook_function(void *addr, void *new_func, void **old_func) {
 #else
     MSHookFunction(addr, new_func, old_func);
 #endif
-
 }
 
 static inline void
 hook_function(void *handle, const char *symbol, void *new_func, void **old_func) {
     void *addr = dlsym(handle, symbol);
     if (addr == NULL) {
+        ALOGE("Unable to hook function: %s", symbol);
         return;
     }
     hook_function(addr, new_func, old_func);
+    ALOGD("Hooked function: %s", symbol);
 }
 
 
@@ -122,7 +127,27 @@ __BEGIN_DECLS
 
 #define FREE(ptr, org_ptr) { if ((void*) ptr != NULL && (void*) ptr != (void*) org_ptr) { free((void*) ptr); } }
 
+// Get signatures by:
+// 1. adb pull /apex/com.android.runtime/lib64/bionic/libc.so libc.so
+// 2. nm -D --defined-only libc.so
 
+// int __openat(int fd, const char *pathname, int flags, int mode);
+HOOK_DEF(int, openat, int fd, const char *pathname, int flags, int mode) {
+    int res;
+    const char *redirect_path = relocate_path(pathname, &res);
+    int ret = syscall(__NR_openat, fd, redirect_path, flags, mode);
+    FREE(redirect_path, pathname);
+    return ret;
+}
+
+// int __openat(int dfd, const char *pathname, struct open_how *how, size_t size);
+HOOK_DEF(int, __openat_2, int dfd, const char *pathname, struct open_how *how, size_t size) {
+    int res;
+    const char *redirect_path = relocate_path(pathname, &res);
+    int ret = syscall(__NR_openat2, dfd, redirect_path, how, size);
+    FREE(redirect_path, pathname);
+    return ret;
+}
 
 // int fstatat64(int dirfd, const char *pathname, struct stat *buf, int flags);
 HOOK_DEF(int, fstatat64, int dirfd, const char *pathname, struct stat *buf, int flags) {
@@ -146,7 +171,7 @@ HOOK_DEF(int, mknodat, int dirfd, const char *pathname, mode_t mode, dev_t dev) 
 
 // int utimensat(int dirfd, const char *pathname, const struct timespec times[2], int flags);
 HOOK_DEF(int, utimensat, int dirfd, const char *pathname, const struct timespec times[2],
-         int flags) {
+        int flags) {
     int res;
     const char *redirect_path = relocate_path(pathname, &res);
     int ret = syscall(__NR_utimensat, dirfd, redirect_path, times, flags);
@@ -211,7 +236,7 @@ HOOK_DEF(int, symlinkat, const char *oldpath, int newdirfd, const char *newpath)
 
 // int linkat(int olddirfd, const char *oldpath, int newdirfd, const char *newpath, int flags);
 HOOK_DEF(int, linkat, int olddirfd, const char *oldpath, int newdirfd, const char *newpath,
-         int flags) {
+        int flags) {
     int res_old;
     int res_new;
     const char *redirect_path_old = relocate_path(oldpath, &res_old);
@@ -265,8 +290,8 @@ HOOK_DEF(int, chdir, const char *pathname) {
 }
 
 
-// int __statfs (__const char *__file, struct statfs *__buf);
-HOOK_DEF(int, __statfs, __const char *__file, struct statfs *__buf) {
+// int statfs (__const char *__file, struct statfs *__buf);
+HOOK_DEF(int, statfs, __const char *__file, struct statfs *__buf) {
     int res;
     const char *redirect_path = relocate_path(__file, &res);
     int ret = syscall(__NR_statfs, redirect_path, __buf);
@@ -282,6 +307,28 @@ HOOK_DEF(int, statfs64, __const char *__file, struct statfs *__buf) {
     FREE(redirect_path, __file);
     return ret;
 }
+
+// Extra open hooks
+#ifdef __x86_64__
+// int __open(const char *pathname, int flags, int mode);
+HOOK_DEF(int, open, const char *pathname, int flags, int mode) {
+    int res;
+    const char *redirect_path = relocate_path(pathname, &res);
+    int ret = syscall(__NR_open, redirect_path, flags, mode);
+    FREE(redirect_path, pathname);
+    return ret;
+}
+
+// int __open2(const char *pathname, int flags, int mode);
+HOOK_DEF(int, __open_2, const char *pathname, int flags, int mode) {
+    int res;
+    const char *redirect_path = relocate_path(pathname, &res);
+    int ret = syscall(__NR_open, redirect_path, flags, mode);
+    FREE(redirect_path, pathname);
+    return ret;
+}
+
+#endif
 
 int inline getArrayItemCount(char *const array[]) {
     int i;
@@ -309,9 +356,9 @@ char **build_new_env(char *const envp[]) {
         sprintf(ld_preload, "LD_PRELOAD=%s", so_path);
     }
     int new_envp_count = orig_envp_count
-                         + get_keep_item_count()
-                         + get_forbidden_item_count()
-                         + get_replace_item_count() * 2 + 1;
+            + get_keep_item_count()
+            + get_forbidden_item_count()
+            + get_replace_item_count() * 2 + 1;
     if (provided_ld_preload) {
         new_envp_count--;
     }
@@ -436,7 +483,7 @@ HOOK_DEF(void*, do_dlopen_V19, const char *filename, int flag, const void *extin
 }
 
 HOOK_DEF(void*, do_dlopen_V24, const char *name, int flags, const void *extinfo,
-         void *caller_addr) {
+        void *caller_addr) {
     int res;
     const char *redirect_path = relocate_path(name, &res);
     void *ret = orig_do_dlopen_V24(redirect_path, flags, extinfo, caller_addr);
@@ -473,7 +520,7 @@ void onSoLoaded(const char *name, void *handle) {
 }
 
 int findSymbol(const char *name, const char *libn,
-               unsigned long *addr) {
+        unsigned long *addr) {
     return find_name(getpid(), name, libn, addr);
 }
 
@@ -481,25 +528,25 @@ void hook_dlopen(int api_level) {
     void *symbol = NULL;
     if (api_level > 25) {
         if (findSymbol("__dl__Z9do_dlopenPKciPK17android_dlextinfoPKv", "linker",
-                       (unsigned long *) &symbol) == 0) {
+                (unsigned long *) &symbol) == 0) {
             hook_function(symbol, (void *) new_do_dlopen_V24,
-                           (void **) &orig_do_dlopen_V24);
+                    (void **) &orig_do_dlopen_V24);
         }
     } else if (api_level > 23) {
         if (findSymbol("__dl__Z9do_dlopenPKciPK17android_dlextinfoPv", "linker",
-                       (unsigned long *) &symbol) == 0) {
+                (unsigned long *) &symbol) == 0) {
             hook_function(symbol, (void *) new_do_dlopen_V24,
-                          (void **) &orig_do_dlopen_V24);
+                    (void **) &orig_do_dlopen_V24);
         }
     } else if (api_level >= 19) {
         if (findSymbol("__dl__Z9do_dlopenPKciPK17android_dlextinfo", "linker",
-                       (unsigned long *) &symbol) == 0) {
+                (unsigned long *) &symbol) == 0) {
             hook_function(symbol, (void *) new_do_dlopen_V19,
-                          (void **) &orig_do_dlopen_V19);
+                    (void **) &orig_do_dlopen_V19);
         }
     } else {
         if (findSymbol("__dl_dlopen", "linker",
-                       (unsigned long *) &symbol) == 0) {
+                (unsigned long *) &symbol) == 0) {
             hook_function(symbol, (void *) new_dlopen, (void **) &orig_dlopen);
         }
     }
@@ -516,10 +563,16 @@ void IOUniformer::startUniformer(const char *so_path, int api_level, int preview
 
     void *handle = dlopen("libc.so", RTLD_NOW);
     if (handle) {
+#ifdef __x86_64__
+        HOOK_SYMBOL(handle, open);
+        HOOK_SYMBOL(handle, __open_2);
+#endif
+        HOOK_SYMBOL(handle, openat);
+        HOOK_SYMBOL(handle, __openat_2);
         HOOK_SYMBOL(handle, fchownat);
         HOOK_SYMBOL(handle, renameat);
         HOOK_SYMBOL(handle, fstatat64);
-        HOOK_SYMBOL(handle, __statfs);
+        HOOK_SYMBOL(handle, statfs);
         HOOK_SYMBOL(handle, mkdirat);
         HOOK_SYMBOL(handle, mknodat);
         HOOK_SYMBOL(handle, truncate);

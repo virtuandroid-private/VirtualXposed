@@ -62,6 +62,7 @@ inline void logf(const char* tag, const char* msg, ARGS... args) noexcept {
   log(ANDROID_LOG_FATAL, tag, msg, args...);
 }
 
+#define LOG_TAG "fb-jni"
 
 #ifdef LOG_TAG
 # define ALOGV(...) ::facebook::alog::logv(LOG_TAG, __VA_ARGS__)

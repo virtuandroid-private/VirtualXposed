@@ -479,6 +479,17 @@ public final class VClientImpl extends IVClient.Stub {
         NativeEngine.redirectDirectory("/data/data/" + info.packageName + "/lib/", libPath);
         NativeEngine.redirectDirectory("/data/user/0/" + info.packageName + "/lib/", libPath);
 
+        String hostPkg = VirtualCore.get().getHostPkg();
+
+        // Forbid everything in the real app path except for whitelisted paths
+        NativeEngine.forbid("/data/data/" + hostPkg);
+        NativeEngine.forbid("/data/user/0/" + hostPkg);
+        NativeEngine.whitelist(info.dataDir, true);
+        NativeEngine.whitelist("/data/user/0/" + hostPkg + "/virtual/data/app/" + info.packageName, true);
+        NativeEngine.whitelist("/data/user/0/" + hostPkg + "/virtual/data/app/" + info.packageName, true);
+        // TODO REWORK THIS TO PREVENT APPS FROM READING THIS FILE
+        NativeEngine.whitelist("/data/user/0/" + hostPkg + "/virtual/data/user/0/de.robv.android.xposed.installer/exposed_conf/modules.list", false);
+
         File dataUserLib = new File(VEnvironment.getDataUserPackageDirectory(userId, info.packageName), "lib");
         if (!dataUserLib.exists()) {
             try {

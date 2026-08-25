@@ -28,6 +28,7 @@ import java.util.Map;
 public class NativeEngine {
     private static final String TAG = NativeEngine.class.getSimpleName();
 
+    // TODO REMOVE ESCAPE PATH!
     private static final String VESCAPE = "/6decacfa7aad11e8a718985aebe4663a";
 
     private static Map<String, InstalledAppInfo> sDexOverrideMap;

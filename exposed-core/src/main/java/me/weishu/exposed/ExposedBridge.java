@@ -699,7 +699,7 @@ public class ExposedBridge {
             return false; // xposed installer not enabled, must load all.
         }
 
-        final File modules = new File(xposedInstallerDir, "conf/modules.list");
+        final File modules = new File(xposedInstallerDir, "exposed_conf/modules.list");
         Log.d(TAG, "module file:" + modules);
         if (!modules.exists()) {
             Log.d(TAG, "xposed installer's modules not exist, ignore.");
