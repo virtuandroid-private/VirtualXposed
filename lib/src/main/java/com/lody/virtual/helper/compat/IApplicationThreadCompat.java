@@ -9,8 +9,10 @@ import android.os.RemoteException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import mirror.android.app.IApplicationThread;
+import mirror.android.app.IApplicationThread14;
 import mirror.android.app.IApplicationThreadICSMR1;
 import mirror.android.app.IApplicationThreadKitkat;
 import mirror.android.app.IApplicationThreadOreo;
@@ -22,6 +24,7 @@ import mirror.android.content.res.CompatibilityInfo;
  */
 
 public class IApplicationThreadCompat {
+    private static final AtomicLong sBindSequence = new AtomicLong(0);
 
     public static void scheduleCreateService(IInterface appThread, IBinder token, ServiceInfo info,
                                              int processState) throws RemoteException {
@@ -39,7 +42,10 @@ public class IApplicationThreadCompat {
 
     public static void scheduleBindService(IInterface appThread, IBinder token, Intent intent, boolean rebind,
                                            int processState) throws RemoteException {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            long sequence = sBindSequence.getAndIncrement();
+            IApplicationThread14.scheduleBindService.call(appThread, token, intent, rebind, processState, sequence);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             IApplicationThreadKitkat.scheduleBindService.call(appThread, token, intent, rebind, processState);
         } else {
             IApplicationThread.scheduleBindService.call(appThread, token, intent, rebind);

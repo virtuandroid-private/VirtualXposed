@@ -189,7 +189,10 @@ public class MethodInvocationStub<T> {
                     res = methodProxy.call(mBaseInterface, method, args);
                     res = methodProxy.afterCall(mBaseInterface, method, args, res);
                 } else {
-//                    if (BuildConfig.DEBUG) {
+//                    String name = method.getName();
+//                    if (BuildConfig.DEBUG && !name.contains("getpid") && !name.contains("myPid")) {
+//                        int pid = android.os.Process.myPid();
+//                        System.out.println("Running proxy method " + name + " on pid " + pid);
 //                        try {
 //                            System.out.println("Not hooked " + mBaseInterface + " method: " + method.getName() + " Arguments: " + Arrays.toString(args));
 //                        } catch (Throwable e) {

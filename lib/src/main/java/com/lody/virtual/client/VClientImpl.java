@@ -482,11 +482,14 @@ public final class VClientImpl extends IVClient.Stub {
         String hostPkg = VirtualCore.get().getHostPkg();
 
         // Forbid everything in the real app path except for whitelisted paths
-        NativeEngine.forbid("/data/data/" + hostPkg);
-        NativeEngine.forbid("/data/user/0/" + hostPkg);
+
+        // TODO ENABLE THESE FORBIDS
+        // They currently break content provider
+//        NativeEngine.forbid("/data/data/" + hostPkg);
+//        NativeEngine.forbid("/data/user/0/" + hostPkg);
         NativeEngine.whitelist(info.dataDir, true);
         NativeEngine.whitelist("/data/user/0/" + hostPkg + "/virtual/data/app/" + info.packageName, true);
-        NativeEngine.whitelist("/data/user/0/" + hostPkg + "/virtual/data/app/" + info.packageName, true);
+        NativeEngine.whitelist("/data/user/0/" + hostPkg + "/virtual/data/user/0/" + info.packageName, true);
         // TODO REWORK THIS TO PREVENT APPS FROM READING THIS FILE
         NativeEngine.whitelist("/data/user/0/" + hostPkg + "/virtual/data/user/0/de.robv.android.xposed.installer/exposed_conf/modules.list", false);
 
