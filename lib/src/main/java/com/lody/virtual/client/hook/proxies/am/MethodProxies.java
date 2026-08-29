@@ -921,7 +921,7 @@ class MethodProxies {
             Intent service = (Intent) args[2];
             String resolvedType = (String) args[3];
             IServiceConnection conn = (IServiceConnection) args[4];
-            int flags = (int) args[5];
+            int flags = (int) (long) args[5];
             int userId = VUserHandle.myUserId();
             if (isServerProcess()) {
                 userId = service.getIntExtra("_VA_|_user_id_", VUserHandle.USER_NULL);
