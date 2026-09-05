@@ -61,4 +61,6 @@ dependencies {
     api("me.weishu.exposed:exposed-xposedapi:0.4.6")
 
     implementation("io.github.vvb2060.ndk:dobby:1.2")
+    implementation("androidx.tracing:tracing-ktx:2.0.1")
+    implementation("com.jakewharton.timber:timber:5.0.1")
 }

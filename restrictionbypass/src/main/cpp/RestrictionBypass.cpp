@@ -10,7 +10,7 @@ JNIEnv *attachCurrentThread() {
     JNIEnv *env;
 
     int res = _vm->AttachCurrentThread(&env, nullptr);
-    __android_log_print(ANDROID_LOG_DEBUG, "native", "Found attached %d", res);
+//    __android_log_print(ANDROID_LOG_DEBUG, "native", "Found attached %d", res);
     return env;
 }
 
@@ -38,7 +38,7 @@ void printClassName(jobject obj, JNIEnv *env) {
     const char *str = env->GetStringUTFChars(strObj, NULL);
 
 // Print the class name
-    __android_log_print(ANDROID_LOG_DEBUG, "native", "Calling class is: %s\n", str);
+//    __android_log_print(ANDROID_LOG_DEBUG, "native", "Calling class is: %s\n", str);
 // Release the memory pinned char array
     env->ReleaseStringUTFChars(strObj, str);
 }

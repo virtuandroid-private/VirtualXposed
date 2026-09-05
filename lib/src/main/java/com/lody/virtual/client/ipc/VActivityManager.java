@@ -1,11 +1,12 @@
 package com.lody.virtual.client.ipc;
 
 import android.app.Activity;
+import android.app.IApplicationThread;
 import android.app.IServiceConnection;
 import android.app.Notification;
-import android.app.ApplicationErrorReport;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.IIntentReceiver;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.ActivityInfo;
@@ -468,6 +469,14 @@ public class VActivityManager {
         Intent newIntent = ComponentUtils.redirectBroadcastIntent(intent, userId);
         if (newIntent != null) {
             VirtualCore.get().getContext().sendBroadcast(newIntent);
+        }
+    }
+
+    public int broadcastIntentWithFeature(IApplicationThread caller, String callingFeatureId, Intent intent, String resolvedType, IIntentReceiver resultTo, int resultCode, String resultData, Bundle map, String[] requiredPermissions, String[] excludePermissions, String[] excludePackages, int appOp, Bundle options, boolean serialized, boolean sticky, int userId) throws RemoteException {
+        try {
+            return getService().broadcastIntentWithFeature(caller, callingFeatureId, intent, resolvedType, resultTo, resultCode, resultData, map, requiredPermissions, excludePermissions, excludePackages, appOp, options, serialized, sticky, userId);
+        } catch (RemoteException e) {
+            return VirtualRuntime.crash(e);
         }
     }
 

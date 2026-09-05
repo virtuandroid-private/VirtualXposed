@@ -12,7 +12,8 @@ import android.app.Notification;
 import android.app.IServiceConnection;
 import android.app.IActivityManager.ContentProviderHolder;
 import com.lody.virtual.server.interfaces.IProcessObserver;
-
+import android.content.IIntentReceiver;
+import android.app.IApplicationThread;
 
 interface IActivityManager {
 
@@ -115,4 +116,9 @@ interface IActivityManager {
     void notifyBadgerChange(in BadgerInfo info);
 
     oneway void removeContentProvider(in IBinder connection, boolean stable);
+
+    int broadcastIntentWithFeature(in IApplicationThread caller, in String callingFeatureId,
+            in Intent intent, in String resolvedType, in IIntentReceiver resultTo, int resultCode,
+            in String resultData, in Bundle map, in String[] requiredPermissions, in String[] excludePermissions,
+            in String[] excludePackages, int appOp, in Bundle options, boolean serialized, boolean sticky, int userId);
 }

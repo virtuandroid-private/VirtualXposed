@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import timber.log.Timber;
+
 /**
  * @author Luca Boscolo Meneguolo @calugj
  */
@@ -28,11 +30,11 @@ class MediaStoreCache extends LockedOperation {
     @Override
     protected void load(final FileChannel channel) {
         try {
-            VLog.i(TAG, "Loading MediaStore cache from file");
+            Timber.d("Loading MediaStore cache from file");
             cache = parser.read(Channels.newInputStream(channel));
         } catch (Exception e) {
-            VLog.e(TAG, "Could not read MediaStore file");
-            e.printStackTrace();
+            Timber.d("Could not read MediaStore file");
+            Timber.d(e);
         }
     }
 

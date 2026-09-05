@@ -9,17 +9,16 @@ import com.lody.virtual.client.interfaces.IInjector;
 import java.lang.reflect.Field;
 
 import mirror.android.app.ActivityThread;
+import timber.log.Timber;
 
 /**
  * @author weishu
  * @date 2018/8/7.
  */
 public class TransactionHandlerStub implements IInjector {
-    private static final String TAG = "TransactionHandlerStub";
-
     @Override
     public void inject() throws Throwable {
-        Log.i(TAG, "inject transaction handler.");
+        Timber.d("Inject transaction handler.");
         Object activityThread = ActivityThread.currentActivityThread.call();
         Object transactionExecutor = ActivityThread.mTransactionExecutor.get(activityThread);
 
@@ -29,7 +28,7 @@ public class TransactionHandlerStub implements IInjector {
         TransactionHandlerProxy proxy = new TransactionHandlerProxy(original);
 
         mTransactionHandlerField.set(transactionExecutor, proxy);
-        Log.i(TAG, "executor's handler: " + mTransactionHandlerField.get(transactionExecutor));
+        Timber.d("Executor's handler: %s", mTransactionHandlerField.get(transactionExecutor));
     }
 
     @Override

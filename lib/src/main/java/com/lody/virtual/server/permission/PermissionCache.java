@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import timber.log.Timber;
+
 /**
  * @author Alberto Lazari
  */
@@ -34,11 +36,10 @@ class PermissionCache extends LockedOperation {
     @Override
     protected void load(final FileChannel channel) {
         try {
-            VLog.i(TAG, "Loading permission cache from file");
+            Timber.d("Loading permission cache from file");
             cache = parser.read(Channels.newInputStream(channel));
         } catch (Exception e) {
-            VLog.e(TAG, "Could not read permissions file");
-            e.printStackTrace();
+            Timber.e(e,"Could not read permissions file");
         }
     }
 

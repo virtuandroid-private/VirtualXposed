@@ -50,6 +50,7 @@ import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
+import timber.log.Timber;
 
 import static de.robv.android.xposed.XposedBridge.log;
 
@@ -116,7 +117,6 @@ public class ExposedBridge {
         ExposedHelper.initSeLinux(applicationInfo.processName);
         XSharedPreferences.setPackageBaseDirectory(new File(applicationInfo.dataDir).getParentFile());
 
-        initForXposedModule(context, applicationInfo, appClassLoader);
         initForXposedInstaller(context, applicationInfo, appClassLoader);
         initForWechat(context, applicationInfo, appClassLoader);
         initForQQ(context, applicationInfo, appClassLoader);
@@ -188,14 +188,14 @@ public class ExposedBridge {
         loadModuleConfig(rootDir, currentApplicationInfo.processName);
 
         if (lastModuleList.second == null || !lastModuleList.second.contains(moduleApkPath)) {
-            Log.i(TAG, "module:" + moduleApkPath + " is disabled, ignore");
+            // Timber.d("Module: %s is disabled, ignore",  moduleApkPath);
             return ModuleLoadResult.DISABLED;
         }
 
-        Log.i(TAG, "Loading modules from " + moduleApkPath + " for process: " + currentApplicationInfo.processName + " i s c: " + SYSTEM_CLASSLOADER_INJECT);
+        Timber.i("Loading modules from: %s for process: %s",  moduleApkPath,  currentApplicationInfo.processName );
 
         if (!new File(moduleApkPath).exists()) {
-            log(moduleApkPath + " does not exist");
+            Timber.e("Module %s does not exist", moduleApkPath);
             return ModuleLoadResult.NOT_EXIST;
         }
 
@@ -215,7 +215,7 @@ public class ExposedBridge {
 
         InputStream is = mcl.getResourceAsStream("assets/xposed_init");
         if (is == null) {
-            log("assets/xposed_init not found in the APK");
+            Timber.e("Initialization file assets/xposed_init not found in the module APK");
             return ModuleLoadResult.INVALID;
         }
 
@@ -232,7 +232,7 @@ public class ExposedBridge {
                     continue;
                 }
                 try {
-                    Log.i(TAG, "  Loading class " + moduleClassName);
+                    Timber.i("Loading class %s", moduleClassName);
                     Class<?> moduleClass = mcl.loadClass(moduleClassName);
 
                     sModuleLoadListener.onLoadingModule(moduleClassName, currentApplicationInfo, mcl);
@@ -335,12 +335,6 @@ public class ExposedBridge {
 
         presetMethod(method);
 
-//        XC_MethodHook.Unhook replaceUnhook = CHAHelper.replaceForCHA(method, callback);
-//        if (replaceUnhook != null) {
-//            return ExposedHelper.newUnHook(callback, replaceUnhook.getHookedMethod());
-//        }
-
-//        final XC_MethodHook.Unhook unhook = DexposedBridge.hookMethod(method, callback);
         final XC_MethodHook.Unhook unhook = LSPosedBridge.INSTANCE.createHook(method, callback);
         return ExposedHelper.newUnHook(callback, unhook.getHookedMethod());
     }
@@ -349,20 +343,6 @@ public class ExposedBridge {
             throws NullPointerException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 
         return LSPosedBridge.INSTANCE.invokeOriginalMethod(method, thisObject, args);
-    }
-
-
-    private static void initForXposedModule(Context context, ApplicationInfo applicationInfo, ClassLoader appClassLoader) {
-        InputStream inputStream = null;
-
-        try {
-            inputStream = context.getAssets().open("xposed_init");
-            System.setProperty("epic.force", "true");
-        } catch (IOException e) {
-            Log.i(TAG, applicationInfo.packageName + " is not a Xposed module, do not init epic.force");
-        } finally {
-            closeSliently(inputStream);
-        }
     }
 
     private static boolean isXposedInstaller(ApplicationInfo applicationInfo) {
@@ -685,36 +665,30 @@ public class ExposedBridge {
      */
     private static boolean loadModuleConfig(String rootDir, String processName) {
         if (lastModuleList != null && TextUtils.equals(lastModuleList.first, processName) && lastModuleList.second != null) {
-            Log.d(TAG, "lastmodule valid, do not load config repeat");
+            // Timber.d("Last module valid, do not load config repeat");
             return true; // xposed installer has config file, and has already loaded for this process, return.
         }
 
-
-        // load modules
         final File xposedInstallerDir = new File(rootDir, XPOSED_INSTALL_PACKAGE);
 
-        Log.d(TAG, "xposedInstaller Dir:" + xposedInstallerDir);
         if (!xposedInstallerDir.exists()) {
-            Log.d(TAG, "XposedInstaller not installed, ignore.");
+            Timber.i("XposedInstaller not installed. Module loading skipped.");
             return false; // xposed installer not enabled, must load all.
         }
 
         final File modules = new File(xposedInstallerDir, "exposed_conf/modules.list");
-        Log.d(TAG, "module file:" + modules);
         if (!modules.exists()) {
-            Log.d(TAG, "xposed installer's modules not exist, ignore.");
+            Timber.i("Xposed installer's modules do not exist. Module loading skipped.");
             try {
                 modules.getParentFile().mkdirs();
                 modules.createNewFile();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            } catch (Throwable t) {
+                Timber.e(t);
             }
             return false; // xposed installer config file not exist, load all.
         }
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(new FileReader(modules));
-            String line = null;
+        try (BufferedReader br = new BufferedReader(new FileReader(modules))) {
+            String line;
             Set<String> moduleSet = new HashSet<>();
             while ((line = br.readLine()) != null) {
                 line = line.trim();
@@ -728,19 +702,11 @@ public class ExposedBridge {
             }
 
             lastModuleList = Pair.create(processName, moduleSet);
-            // Log.d(TAG, "last moduleslist: " + lastModuleList);
+            Timber.d("Module list: %s", moduleSet);
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            Timber.e(e);
             return false;
-        } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
 

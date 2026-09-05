@@ -28,6 +28,7 @@ dependencies {
     implementation project(path: ':lsplantbridge')
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.getkeepsafe.relinker:relinker:1.4.4' // for load library
+    implementation 'com.jakewharton.timber:timber:5.0.1'
 }
 
 tasks.withType(JavaCompile) {

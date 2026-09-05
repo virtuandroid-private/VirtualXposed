@@ -2,7 +2,7 @@
 // VirtualApp Native Project
 //
 #include <unistd.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <fb/include/fb/ALog.h>
 
 #ifdef __x86_64__
@@ -24,6 +24,17 @@
 #include "SandboxFs.h"
 #include "Path.h"
 #include "SymbolFinder.h"
+
+#include <iostream>
+#include <unistd.h>
+#include <sys/prctl.h>
+#include <sys/syscall.h>
+#include <linux/seccomp.h>
+#include <linux/filter.h>
+#include <linux/audit.h>
+#include <fcntl.h>
+#include <cerrno>
+#include <cstring>
 
 bool iu_loaded = false;
 
@@ -552,6 +563,65 @@ void hook_dlopen(int api_level) {
     }
 }
 
+// TODO proxy all open calls to the main application and
+// prevent all open calls using seccomp. This makes it impossible to spoof open.
+
+//#if defined(__aarch64__)
+//    #define AUDIT_ARCH_CURRENT AUDIT_ARCH_AARCH64
+//#elif defined(__arm__)
+//    #define AUDIT_ARCH_CURRENT AUDIT_ARCH_ARM
+//#elif defined(__x86_64__)
+//    #define AUDIT_ARCH_CURRENT AUDIT_ARCH_X86_64
+//#else
+//    #define AUDIT_ARCH_CURRENT AUDIT_ARCH_I386
+//#endif
+//
+//void apply_seccomp_filter() {
+//    // 1. Prevent gaining new privileges via setuid/setgid binaries
+//    if (prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0) == -1) {
+//        ALOGD("Failed to set PR_SET_NO_NEW_PRIVS");
+//        return;
+//    }
+//
+//    // 2. Define the BPF Filter Instructions
+//    struct sock_filter filter[] = {
+//        // [0] Load architecture number from system call data frame into accumulator
+//        BPF_STMT(BPF_LD | BPF_W | BPF_ABS, offsetof(struct seccomp_data, arch)),
+//
+//        // [1] Verify architecture matches target (prevents arch-switching exploits)
+//        BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, AUDIT_ARCH_CURRENT, 1, 0),
+//        BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_KILL_PROCESS),
+//
+//        // [2] Load system call number into accumulator
+//        BPF_STMT(BPF_LD | BPF_W | BPF_ABS, offsetof(struct seccomp_data, nr)),
+//
+//#ifdef __NR_open
+//        // [3] Check if Syscall is 'open'
+//        BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, __NR_open, 2, 0),
+//#endif
+//        // [4] Check if Syscall is 'openat'
+//        BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, __NR_openat, 1, 0),
+//
+//        // [5] If not open/openat, ALLOW the syscall
+//        BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_ALLOW),
+//
+//        // [6] If open/openat matched, RETURN EACCES error (or EPERM)
+//        BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_ERRNO | (EACCES & SECCOMP_RET_DATA))
+//    };
+//
+//    struct sock_fprog prog = {
+//        .len = static_cast<unsigned short>(sizeof(filter) / sizeof(filter[0])),
+//        .filter = filter,
+//    };
+//
+//    // 3. Apply the filter using prctl
+//    if (prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, &prog) == -1) {
+//        ALOGD("Failed to apply Seccomp filter");
+//        return;
+//    }
+//
+//    ALOGD("Applied Seccomp filter successfully");
+//}
 
 void IOUniformer::startUniformer(const char *so_path, int api_level, int preview_api_level) {
     char api_level_chars[5];
@@ -586,5 +656,7 @@ void IOUniformer::startUniformer(const char *so_path, int api_level, int preview
         HOOK_SYMBOL(handle, statfs64);
         dlclose(handle);
     }
+
+//    apply_seccomp_filter();
     // hook_dlopen(api_level);
 }

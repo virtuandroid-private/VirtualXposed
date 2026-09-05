@@ -38,6 +38,7 @@ import io.virtualapp.home.models.PackageAppData;
 import io.virtualapp.home.repo.PackageAppDataStorage;
 import io.virtualapp.widgets.EatBeansView;
 import jonathanfinerty.once.Once;
+import timber.log.Timber;
 
 /**
  * @author Lody
@@ -115,13 +116,13 @@ public class LoadingActivity extends VActivity {
                 }
             }
 
-            VLog.i(TAG, pkg + "is running: " + uiRunning);
+            Timber.d("Package %s has UI running status %s", pkg, uiRunning);
             if (uiRunning) {
                 launchActivity(intent, userId);
                 return;
             }
-        } catch (Throwable ignored) {
-            ignored.printStackTrace();
+        } catch (Throwable t) {
+            Timber.e(t);
         }
 
         checkAndLaunch(intent, userId);
@@ -145,13 +146,12 @@ public class LoadingActivity extends VActivity {
         try {
             ApplicationInfo applicationInfo = VPackageManager.get().getApplicationInfo(packageName, 0, 0);
             int targetSdkVersion = applicationInfo.targetSdkVersion;
-            Log.i(TAG, "target package: " + packageName + " targetSdkVersion: " + targetSdkVersion);
+            Timber.d("Target package: %s contains targetSdkVersion: %s", packageName, targetSdkVersion);
 
             if (targetSdkVersion >= RUNTIME_PERMISSION_API_LEVEL) {
-                Log.i(TAG, "target package support runtime permission, launch directly.");
+                Timber.d("Target package: %s support runtime permission, launch directly.", packageName);
                 launchActivityWithDelay(intent, userId);
             } else {
-
                 intentToLaunch = intent;
                 userToLaunch = userId;
 
@@ -165,18 +165,18 @@ public class LoadingActivity extends VActivity {
                         if (ContextCompat.checkSelfPermission(this, requestedPermission) != PackageManager.PERMISSION_GRANTED) {
                             dangerousPermissions.add(requestedPermission);
                         } else {
-                            Log.i(TAG, "permission: " + requestedPermission + " is granted, ignore.");
+                            Timber.i("permission: " + requestedPermission + " is granted, ignore.");
                         }
                     }
                 }
 
                 if (dangerousPermissions.isEmpty()) {
-                    Log.i(TAG, "all permission are granted, launch directly.");
+                    Timber.i("All permission are granted, launch directly.");
                     // all permission are granted, launch directly.
                     launchActivityWithDelay(intent, userId);
                 } else {
                     // tell user that this app need that permission
-                    Log.i(TAG, "request permission: " + dangerousPermissions);
+                    Timber.i("Request permission: %s", dangerousPermissions);
 
                     AlertDialog alertDialog = new AlertDialog.Builder(this)
                             .setTitle(R.string.permission_tip_title)
@@ -199,7 +199,7 @@ public class LoadingActivity extends VActivity {
                 }
             }
         } catch (Throwable e) {
-            Log.e(TAG, "check permission failed: ", e);
+            Timber.e(e, "Check permission failed");
             launchActivityWithDelay(intent, userId);
         }
     }

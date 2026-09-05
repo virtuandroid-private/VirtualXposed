@@ -63,14 +63,12 @@ public final class CHAHelper {
             XposedBridge.log("replace Application.attach with ContextWrapper.attachBaseContext for CHA");
             Method m = XposedHelpers.findMethodExact(ContextWrapper.class, "attachBaseContext", Context.class);
             return LSPosedBridge.INSTANCE.createHook(m, new ApplicationHookProxy(callback));
-//            return DexposedBridge.hookMethod(m, new ApplicationHookProxy(callback));
         }
 
         if (member.getDeclaringClass() == Application.class && "onCreate".equals(member.getName())) {
             XposedBridge.log("replace Application.onCreate with ContextWrapper.attachBaseContext for CHA");
             Method m = XposedHelpers.findMethodExact(ContextWrapper.class, "attachBaseContext", Context.class);
             return LSPosedBridge.INSTANCE.createHook(m, new ApplicationHookProxy(callback));
-//            return DexposedBridge.hookMethod(m, new ApplicationHookProxy(callback));
         }
 
         return null;

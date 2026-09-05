@@ -83,6 +83,7 @@ import mirror.android.view.ThreadedRenderer;
 import mirror.com.android.internal.content.ReferrerIntent;
 import mirror.dalvik.system.VMRuntime;
 import mirror.java.lang.ThreadGroupN;
+import timber.log.Timber;
 
 /**
  * @author Lody
@@ -246,19 +247,19 @@ public final class VClientImpl extends IVClient.Stub {
         try {
             setupUncaughtHandler();
         } catch (Throwable e) {
-            e.printStackTrace();
+            Timber.e(e);
         }
         try {
             fixInstalledProviders();
         } catch (Throwable e) {
-            e.printStackTrace();
+            Timber.e(e);
         }
         mirror.android.os.Build.SERIAL.set(deviceInfo.serial);
         mirror.android.os.Build.DEVICE.set(Build.DEVICE.replace(" ", "_"));
         AppBindData data = new AppBindData();
         InstalledAppInfo info = VirtualCore.get().getInstalledAppInfo(packageName, 0);
         if (info == null) {
-            new Exception("App not exist!").printStackTrace();
+            Timber.e(new Exception("App not exist!"));
             Process.killProcess(0);
             System.exit(0);
         }
@@ -266,7 +267,7 @@ public final class VClientImpl extends IVClient.Stub {
         data.processName = processName;
         data.appInfo.processName = processName;
         data.providers = VPackageManager.get().queryContentProviders(processName, getVUid(), PackageManager.GET_META_DATA);
-        VLog.i(TAG, String.format("Binding application %s, (%s)", data.appInfo.packageName, data.processName));
+        Timber.i("Binding application %s, (%s)", data.appInfo.packageName, data.processName);
         mBoundApplication = data;
         VirtualRuntime.setupRuntime(data.processName, data.appInfo);
         int targetSdkVersion = data.appInfo.targetSdkVersion;
@@ -335,7 +336,7 @@ public final class VClientImpl extends IVClient.Stub {
 
         boolean enableXposed = VirtualCore.get().isXposedEnabled();
         if (enableXposed) {
-            VLog.i(TAG, "Xposed is enabled.");
+            Timber.i("Xposed is enabled.");
             ClassLoader originClassLoader = context.getClassLoader();
             ExposedBridge.initOnce(context, data.appInfo, originClassLoader);
             List<InstalledAppInfo> modules = VirtualCore.get().getInstalledApps(0);
@@ -344,7 +345,7 @@ public final class VClientImpl extends IVClient.Stub {
                         data.appInfo, originClassLoader);
             }
         } else {
-            VLog.w(TAG, "Xposed is not enabled");
+            Timber.w("Xposed is not enabled");
         }
 
         ClassLoader cl = LoadedApk.getClassLoader.call(data.info);
@@ -461,6 +462,7 @@ public final class VClientImpl extends IVClient.Stub {
 
     @SuppressLint("SdCardPath")
     private void startIOUniformer() {
+        Timber.i("Starting IO Sandbox");
         ApplicationInfo info = mBoundApplication.appInfo;
         int userId = VUserHandle.myUserId();
         String wifiMacAddressFile = deviceInfo.getWifiFile(userId).getPath();

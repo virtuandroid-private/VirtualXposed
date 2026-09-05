@@ -1,6 +1,7 @@
 package com.lody.virtual.server.am;
 
 import android.app.ActivityManager;
+import android.app.IApplicationThread;
 import android.app.IServiceConnection;
 import android.app.IStopUserCallback;
 import android.app.Notification;
@@ -8,6 +9,7 @@ import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.IIntentReceiver;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.ActivityInfo;
@@ -1134,7 +1136,15 @@ public class VActivityManagerService extends IActivityManager.Stub {
 
     @Override
     public void removeContentProvider(IBinder connection, boolean stable) throws RemoteException {
-        System.out.println("REMOVE THIS 123");
-        return;
+    }
+
+    @Override
+    public int broadcastIntentWithFeature(IApplicationThread caller, String callingFeatureId, Intent intent, String resolvedType, IIntentReceiver resultTo, int resultCode, String resultData, Bundle map, String[] requiredPermissions, String[] excludePermissions, String[] excludePackages, int appOp, Bundle options, boolean serialized, boolean sticky, int userId) throws RemoteException {
+        // Android 11+ uses broadcastIntentWithFeature internally instead of sendBroadcast
+        SpecialComponentList.protectIntent(intent);
+        Context context = VirtualCore.get().getContext();
+        intent.putExtra("_VA_|_user_id_", userId);
+        context.sendBroadcast(intent);
+        return 0;
     }
 }

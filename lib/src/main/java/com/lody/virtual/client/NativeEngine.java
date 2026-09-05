@@ -3,7 +3,6 @@ package com.lody.virtual.client;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Process;
-import android.util.Log;
 
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.env.VirtualRuntime;
@@ -21,6 +20,8 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import timber.log.Timber;
 
 /**
  * VirtualApp Native Project
@@ -81,7 +82,7 @@ public class NativeEngine {
     }
 
     public static void redirectDirectory(String origPath, String newPath) {
-        Log.d(TAG, "Redirect path: " + origPath + " to path: " + newPath);
+        Timber.d("Redirect path: %s -> %s", origPath, newPath);
 
         if (!origPath.endsWith("/")) {
             origPath = origPath + "/";
@@ -123,7 +124,8 @@ public class NativeEngine {
     }
 
     public static void whitelist(String path, boolean directory) {
-        Log.d(TAG, "Whitelisted path: " + path);
+        Timber.d("Whitelisted path: %s", path);
+
         if (directory && !path.endsWith("/")) {
             path = path + "/";
         } else if (!directory && path.endsWith("/")) {
@@ -137,7 +139,7 @@ public class NativeEngine {
     }
 
     public static void forbid(String path) {
-        Log.d(TAG, "Forbid path: " + path);
+        Timber.d("Forbid path: %s", path);
 
         if (!path.endsWith("/")) {
             path = path + "/";
@@ -160,7 +162,7 @@ public class NativeEngine {
             redirectDirectory(VESCAPE, "/");
             nativeEnableIORedirect(soPath, Build.VERSION.SDK_INT, BuildCompat.getPreviewSDKInt());
         } catch (Throwable e) {
-            VLog.e(TAG, VLog.getStackTraceString(e));
+            Timber.e(e);
         }
     }
 
@@ -172,7 +174,7 @@ public class NativeEngine {
         try {
             nativeLaunchEngine(methods, VirtualCore.get().getHostPkg(), VirtualRuntime.isArt(), Build.VERSION.SDK_INT, NativeMethods.gCameraMethodType);
         } catch (Throwable e) {
-            VLog.e(TAG, VLog.getStackTraceString(e));
+            Timber.e(e);
         }
         sFlag = true;
     }

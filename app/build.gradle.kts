@@ -122,4 +122,5 @@ dependencies {
     // Android Studio Preview support
     implementation("androidx.compose.ui:ui-tooling-preview")
     debugImplementation("androidx.compose.ui:ui-tooling")
+    implementation("com.jakewharton.timber:timber:5.0.1")
 }

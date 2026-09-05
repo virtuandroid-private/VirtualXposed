@@ -9,6 +9,7 @@ import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.stub.VASettings;
 
 import io.virtualapp.delegate.MyVirtualInitializer;
+import timber.log.Timber;
 
 /**
  * @author Lody
@@ -46,6 +47,8 @@ public class XApp extends Application {
         super.onCreate();
         VirtualCore virtualCore = VirtualCore.get();
         virtualCore.initialize(new MyVirtualInitializer(this, virtualCore));
+        Timber.DebugTree tree = new Timber.DebugTree();
+        Timber.plant(tree);
     }
 
 }

@@ -1,6 +1,8 @@
 package de.robv.android.xposed
 
+import androidx.tracing.trace
 import com.virtualxposed.lsplantbridge.LSPlantHelper
+import timber.log.Timber
 import java.lang.reflect.Member
 import java.lang.reflect.Modifier
 
@@ -8,8 +10,10 @@ object LSPosedBridge {
     val bridge = LSPlantHelper()
 
     fun createHook(target: Member, callback: XC_MethodHook): XC_MethodHook.Unhook {
-        println("Hooking method with LSPosedBridge. Target is: $target")
-        return hookMember(target, callback)
+        Timber.i("Hooking method with LSPosedBridge. Target is: $target")
+        return trace("Method hook") {
+            hookMember(target, callback)
+        }
     }
 
     fun invokeOriginalMethod(method: Member, thisObject: Any?, args: Array<Any?>): Any? {
@@ -19,6 +23,7 @@ object LSPosedBridge {
     private fun hookMember(target: Member, callback: XC_MethodHook): XC_MethodHook.Unhook {
         val hooker = bridge.hook(target) { oldMethod, args ->
             val params = XC_MethodHook.MethodHookParam()
+            Timber.d("Executing hooked method: ${oldMethod.name}")
 
             // TODO Checks for:
             // - Abstract classes
@@ -34,9 +39,7 @@ object LSPosedBridge {
             runCatching {
                 callback.beforeHookedMethod(params)
             }.onFailure { throwable ->
-                if (com.virtualxposed.lsplantbridge.BuildConfig.DEBUG) {
-                    throwable.printStackTrace()
-                }
+                Timber.e(throwable)
             }
 
             if (params.returnEarly) {
@@ -51,7 +54,7 @@ object LSPosedBridge {
                     realResult
                 }
             } catch (t: Throwable) {
-                t.printStackTrace()
+                Timber.e(t)
                 params.throwable = t
             }
 
