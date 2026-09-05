@@ -1,8 +1,8 @@
 package de.robv.android.xposed;
 
-import android.util.Log;
-
 import java.lang.reflect.Member;
+
+import timber.log.Timber;
 
 /**
  * Created by weishu on 17/11/30.
@@ -17,8 +17,8 @@ public class ExposedHelper {
     }
 
     public static boolean isIXposedMod(Class<?> moduleClass) {
-        Log.d(TAG, "module's classLoader : " + moduleClass.getClassLoader() + ", super: " + moduleClass.getSuperclass());
-        Log.d(TAG, "IXposedMod's classLoader : " + IXposedMod.class.getClassLoader());
+        Timber.d("Module's classLoader: %s module super class: %s", moduleClass.getClassLoader(), moduleClass.getSuperclass());
+        Timber.d("IXposedMod's classLoader: %s", IXposedMod.class.getClassLoader());
 
         return IXposedMod.class.isAssignableFrom(moduleClass);
     }
