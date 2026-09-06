@@ -3,10 +3,10 @@ package com.lody.virtual.client.ipc
 import android.os.RemoteException
 import com.lody.virtual.client.core.VirtualCore
 import com.lody.virtual.client.env.VirtualRuntime
+import com.lody.virtual.remote.logging.LogMessage
 import com.lody.virtual.server.IVLoggingService
 
 object VLoggingManager {
-    private val TAG: String = VLoggingManager::class.java.simpleName
     private var mRemote: IVLoggingService? = null
 
     private fun getRemoteInterface(): IVLoggingService? {
@@ -29,9 +29,9 @@ object VLoggingManager {
         return mRemote
     }
 
-    fun log(category: String?, message: String?) {
+    fun log(message: LogMessage) {
         try {
-            this.getInterface()?.log(category, message)
+            this.getInterface()?.log(message)
         } catch (e: RemoteException) {
             VirtualRuntime.crash(e)
         }

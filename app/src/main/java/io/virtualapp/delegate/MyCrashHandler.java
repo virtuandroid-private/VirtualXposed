@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import timber.log.Timber;
+
 /**
  * @author weishu
  * @date 2019/2/25.
@@ -70,7 +72,7 @@ public class MyCrashHandler extends BaseCrashHandler {
             Crashes.trackError(e, properties, null);
         }
 
-        Log.i(TAG, "uncaught :" + t, e);
+        Timber.e(e, "Uncaught exception on thread: %s", t);
 
         // must commit.
         sp.edit().putLong(KEY_LAST_CRASH_TIME, now).putString(KEY_LAST_CRASH_TYPE, exceptionType).commit();

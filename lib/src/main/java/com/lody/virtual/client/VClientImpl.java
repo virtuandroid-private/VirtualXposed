@@ -48,7 +48,6 @@ import com.lody.virtual.client.ipc.VirtualStorageManager;
 import com.lody.virtual.client.stub.VASettings;
 import com.lody.virtual.helper.compat.BuildCompat;
 import com.lody.virtual.helper.compat.StorageManagerCompat;
-import com.lody.virtual.helper.utils.DeviceUtil;
 import com.lody.virtual.helper.utils.Reflect;
 import com.lody.virtual.helper.utils.VLog;
 import com.lody.virtual.os.VEnvironment;
@@ -56,6 +55,7 @@ import com.lody.virtual.os.VUserHandle;
 import com.lody.virtual.remote.InstalledAppInfo;
 import com.lody.virtual.remote.PendingResultData;
 import com.lody.virtual.remote.VDeviceInfo;
+import com.lody.virtual.remote.logging.LogMessage;
 import com.lody.virtual.server.interfaces.IUiCallback;
 
 import java.io.File;
@@ -269,6 +269,10 @@ public final class VClientImpl extends IVClient.Stub {
         data.appInfo.processName = processName;
         data.providers = VPackageManager.get().queryContentProviders(processName, getVUid(), PackageManager.GET_META_DATA);
         Timber.i("Binding application %s, (%s)", data.appInfo.packageName, data.processName);
+
+        LogMessage message = new LogMessage.HookMessage("test");
+        VLoggingManager.get().log(message);
+
         mBoundApplication = data;
         VirtualRuntime.setupRuntime(data.processName, data.appInfo);
         int targetSdkVersion = data.appInfo.targetSdkVersion;
