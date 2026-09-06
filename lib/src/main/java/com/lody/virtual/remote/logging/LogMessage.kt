@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.os.Parcel
 import android.os.Parcelable
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 
@@ -15,7 +16,7 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 @Serializable
 @JsonClassDiscriminator("type")
 sealed class LogMessage(
-    val logType: LogType
+    val logType: LogType,
 ) : Parcelable {
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeParcelable(logType, 0)
@@ -34,6 +35,7 @@ sealed class LogMessage(
                 return when (type) {
                     LogType.Hook -> HookMessage(parcel)
                     LogType.AppLoad -> AppLoad()
+                    LogType.AppKill -> AppKill()
                     null -> null
                 }
             }
@@ -57,7 +59,11 @@ sealed class LogMessage(
 
     @SuppressLint("UnsafeOptInUsageError")
     @Serializable
-
     class AppLoad : LogMessage(LogType.AppLoad)
+
+
+    @OptIn(InternalSerializationApi::class)
+    @Serializable
+    class AppKill : LogMessage(LogType.AppKill)
 }
 

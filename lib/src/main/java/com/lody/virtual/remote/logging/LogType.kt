@@ -8,5 +8,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 enum class LogType : Parcelable {
     Hook,
-    AppLoad;
+    AppLoad,
+    AppKill;
 }

@@ -54,9 +54,10 @@ public class LogcatService extends Service {
                 mReading = true;
                 try {
                     Timber.d("Starting Exposed logcat");
-                    List<String> cmds = new ArrayList<String>();
+                    List<String> cmds = new ArrayList<>();
                     cmds.add("sh");
                     cmds.add("-c");
+                    // TODO ADD TAGS FOR MORE XPOSED LOGGING
                     cmds.add("logcat -v time -s XposedStartupMarker:D Xposed:I appproc:I XposedInstaller:I art:F DexposedBridge:I ExposedBridge:D " +
                             "Runtime1:I EpicNative:D VClientImpl:D VApp:I " +
                             " >> " + path);

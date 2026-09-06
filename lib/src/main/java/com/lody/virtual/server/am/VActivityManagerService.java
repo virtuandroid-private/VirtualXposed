@@ -52,8 +52,11 @@ import com.lody.virtual.remote.BadgerInfo;
 import com.lody.virtual.remote.PendingIntentData;
 import com.lody.virtual.remote.PendingResultData;
 import com.lody.virtual.remote.VParceledListSlice;
+import com.lody.virtual.remote.logging.LogMessage;
+import com.lody.virtual.remote.logging.LogMessageHolder;
 import com.lody.virtual.server.IActivityManager;
 import com.lody.virtual.server.interfaces.IProcessObserver;
+import com.lody.virtual.server.log.VLoggingManagerService;
 import com.lody.virtual.server.pm.PackageCacheManager;
 import com.lody.virtual.server.pm.PackageSetting;
 import com.lody.virtual.server.pm.VAppManagerService;
@@ -392,7 +395,7 @@ public class VActivityManagerService extends IActivityManager.Stub {
                 // Report to all of the connections that the service is no longer
                 // available.
                 try {
-                    if(Build.VERSION.SDK_INT >= 26) {
+                    if (Build.VERSION.SDK_INT >= 26) {
                         IServiceConnectionO.connected.call(connection, className, null, true);
                     } else {
                         connection.connected(className, null);
@@ -563,7 +566,7 @@ public class VActivityManagerService extends IActivityManager.Stub {
         }
     }
 
-    private void connectService(IServiceConnection conn, ComponentName component, ServiceRecord.IntentBindRecord r,boolean dead) {
+    private void connectService(IServiceConnection conn, ComponentName component, ServiceRecord.IntentBindRecord r, boolean dead) {
         try {
             BinderDelegateService delegateService = new BinderDelegateService(component, r.binder);
             if (Build.VERSION.SDK_INT >= 26) {
@@ -745,6 +748,15 @@ public class VActivityManagerService extends IActivityManager.Stub {
         mPidsSelfLocked.remove(record.pid);
         processDead(record);
         record.lock.open();
+
+        LogMessage message = new LogMessage.AppKill();
+        LogMessageHolder holder = new LogMessageHolder.Builder(message)
+                .setPackageName(record.processName)
+                .setPid(record.pid)
+                .setHostPackage()
+                .build();
+
+        VLoggingManagerService.get().log(holder);
     }
 
     @Override

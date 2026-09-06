@@ -270,7 +270,7 @@ public final class VClientImpl extends IVClient.Stub {
         data.providers = VPackageManager.get().queryContentProviders(processName, getVUid(), PackageManager.GET_META_DATA);
         Timber.i("Binding application %s, (%s)", data.appInfo.packageName, data.processName);
 
-        LogMessage message = new LogMessage.HookMessage("test");
+        LogMessage message = new LogMessage.AppLoad();
         VLoggingManager.get().log(message);
 
         mBoundApplication = data;
@@ -475,6 +475,7 @@ public final class VClientImpl extends IVClient.Stub {
         NativeEngine.redirectDirectory("/sys/class/net/eth0/address", wifiMacAddressFile);
         NativeEngine.redirectDirectory("/sys/class/net/wifi/address", wifiMacAddressFile);
 
+        // TODO handle cloned packages
         NativeEngine.redirectDirectory("/data/data/" + info.packageName, info.dataDir);
         NativeEngine.redirectDirectory("/data/user/0/" + info.packageName, info.dataDir);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
