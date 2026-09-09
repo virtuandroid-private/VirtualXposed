@@ -13,6 +13,8 @@ import com.lody.virtual.helper.utils.DeviceUtil;
 import com.lody.virtual.helper.utils.VLog;
 import com.lody.virtual.os.VUserHandle;
 import com.lody.virtual.remote.InstalledAppInfo;
+import com.virtualxposed.log.client.LogMessage;
+import com.virtualxposed.log.client.VLoggingClient;
 
 import java.io.File;
 import java.io.IOException;
@@ -212,6 +214,7 @@ public class NativeEngine {
 
     public static void onOpenDexFileNative(String[] params) {
         String dexOrJarPath = params[0];
+        VLoggingClient.get().log(new LogMessage.CodeLoad(dexOrJarPath));
         String outputPath = params[1];
         VLog.d(TAG, "DexOrJarPath = %s, OutputPath = %s.", dexOrJarPath, outputPath);
         try {
@@ -226,6 +229,7 @@ public class NativeEngine {
         }
     }
 
+    // TODO Migrate these to dobby/lsplant for more arch support + proper dlopen restrictions
 
     private static native void nativeLaunchEngine(Object[] method, String hostPackageName, boolean isArt, int apiLevel, int cameraMethodType);
 
@@ -244,6 +248,8 @@ public class NativeEngine {
     private static native void nativeEnableIORedirect(String selfSoPath, int apiLevel, int previewApiLevel);
 
     public static native void disableJit(int apiLevel);
+
+    public static native void hookDlOpen();
 
     public static int onGetUid(int uid) {
         return VClientImpl.get().getBaseVUid();

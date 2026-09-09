@@ -1,20 +1,17 @@
 package com.lody.virtual.client.ipc
 
-import android.os.RemoteException
 import com.lody.virtual.client.core.VirtualCore
-import com.lody.virtual.client.env.VirtualRuntime
-import com.lody.virtual.remote.logging.LogMessage
-import com.lody.virtual.server.IVLoggingService
+import com.virtualxposed.log.client.VLoggingAttacher
+import com.virtualxposed.log.server.IVLoggingService
 
-object VLoggingManager {
+class VLoggingClientAttacher : VLoggingAttacher {
     private var mRemote: IVLoggingService? = null
-
     private fun getRemoteInterface(): IVLoggingService? {
         val logBinder = ServiceManagerNative.getService(ServiceManagerNative.VIRTUAL_LOG)
         return IVLoggingService.Stub.asInterface(logBinder)
     }
 
-    fun getInterface(): IVLoggingService? {
+    override fun getInterface(): IVLoggingService? {
         if (mRemote == null || (!mRemote!!.asBinder()
                 .pingBinder() && !VirtualCore.get().isVAppProcess)
         ) {
@@ -27,18 +24,5 @@ object VLoggingManager {
             }
         }
         return mRemote
-    }
-
-    fun log(message: LogMessage) {
-        try {
-            this.getInterface()?.log(message)
-        } catch (e: RemoteException) {
-            VirtualRuntime.crash(e)
-        }
-    }
-
-    @JvmStatic
-    fun get(): VLoggingManager {
-        return this
     }
 }

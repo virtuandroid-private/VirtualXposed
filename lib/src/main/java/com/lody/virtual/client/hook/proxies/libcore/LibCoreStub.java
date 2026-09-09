@@ -1,13 +1,10 @@
 package com.lody.virtual.client.hook.proxies.libcore;
 
-import com.lody.virtual.client.env.VirtualRuntime;
 import com.lody.virtual.client.hook.base.MethodInvocationStub;
 import com.lody.virtual.client.hook.base.Inject;
 import com.lody.virtual.client.hook.base.MethodInvocationProxy;
 import com.lody.virtual.client.hook.base.MethodProxy;
 import com.lody.virtual.client.hook.base.ReplaceUidMethodProxy;
-import com.lody.virtual.helper.utils.PathChecker;
-import com.lody.virtual.helper.utils.VLog;
 
 import java.lang.reflect.Method;
 

@@ -25,6 +25,7 @@ android {
 
 dependencies {
 //    implementation project(path: ':libepic')
+    implementation project(path: ':log-client')
     implementation project(path: ':lsplantbridge')
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.getkeepsafe.relinker:relinker:1.4.4' // for load library

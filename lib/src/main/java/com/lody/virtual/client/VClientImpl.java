@@ -42,7 +42,7 @@ import com.lody.virtual.client.hook.proxies.am.HCallbackStub;
 import com.lody.virtual.client.hook.secondary.ProxyServiceFactory;
 import com.lody.virtual.client.ipc.VActivityManager;
 import com.lody.virtual.client.ipc.VDeviceManager;
-import com.lody.virtual.client.ipc.VLoggingManager;
+import com.virtualxposed.log.client.VLoggingClient;
 import com.lody.virtual.client.ipc.VPackageManager;
 import com.lody.virtual.client.ipc.VirtualStorageManager;
 import com.lody.virtual.client.stub.VASettings;
@@ -55,8 +55,8 @@ import com.lody.virtual.os.VUserHandle;
 import com.lody.virtual.remote.InstalledAppInfo;
 import com.lody.virtual.remote.PendingResultData;
 import com.lody.virtual.remote.VDeviceInfo;
-import com.lody.virtual.remote.logging.LogMessage;
 import com.lody.virtual.server.interfaces.IUiCallback;
+import com.virtualxposed.log.client.LogMessage;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -271,7 +271,7 @@ public final class VClientImpl extends IVClient.Stub {
         Timber.i("Binding application %s, (%s)", data.appInfo.packageName, data.processName);
 
         LogMessage message = new LogMessage.AppLoad();
-        VLoggingManager.get().log(message);
+        VLoggingClient.get().log(message);
 
         mBoundApplication = data;
         VirtualRuntime.setupRuntime(data.processName, data.appInfo);
@@ -352,6 +352,8 @@ public final class VClientImpl extends IVClient.Stub {
         } else {
             Timber.w("Xposed is not enabled");
         }
+        // TODO remove dependency on isXposedEnabled
+        NativeEngine.hookDlOpen();
 
         ClassLoader cl = LoadedApk.getClassLoader.call(data.info);
         if (BuildCompat.isS()) {

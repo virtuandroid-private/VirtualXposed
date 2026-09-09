@@ -4,7 +4,9 @@ import android.annotation.SuppressLint
 import android.system.Os
 import com.lody.virtual.client.core.VirtualCore
 import com.lody.virtual.os.VBinder
+import com.lody.virtual.os.VEnvironment.getPackageResourcePath
 import com.lody.virtual.server.pm.VPackageManagerService
+import com.virtualxposed.log.client.LogMessage
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.ClassDiscriminatorMode
@@ -64,7 +66,21 @@ class LogMessageHolder private constructor(
             prettyPrint = false
             classDiscriminatorMode = ClassDiscriminatorMode.NONE
             encodeDefaults = true
+            explicitNulls = false
         }
+    }
+
+    fun shouldBeDisplayed(): Boolean {
+        // It is not interesting that an app loads its own base apk
+        // It is expected behavior on every app startup, and already captured by AppLoad
+        if (logMessage is LogMessage.CodeLoad) {
+            val basePackage = getPackageResourcePath(packageName).absolutePath
+            if (basePackage == logMessage.path) {
+                return false
+            }
+        }
+
+        return true
     }
 
     fun toPrettyJson(): String {

@@ -1,6 +1,8 @@
 package de.robv.android.xposed
 
 import androidx.tracing.trace
+import com.virtualxposed.log.client.LogMessage
+import com.virtualxposed.log.client.VLoggingClient
 import com.virtualxposed.lsplantbridge.LSPlantHelper
 import timber.log.Timber
 import java.lang.reflect.Member
@@ -11,6 +13,8 @@ object LSPosedBridge {
 
     fun createHook(target: Member, callback: XC_MethodHook): XC_MethodHook.Unhook {
         Timber.i("Hooking method with LSPosedBridge. Target is: $target")
+        VLoggingClient.get().log(LogMessage.HookAttach(target.name))
+
         return trace("Method hook") {
             hookMember(target, callback)
         }

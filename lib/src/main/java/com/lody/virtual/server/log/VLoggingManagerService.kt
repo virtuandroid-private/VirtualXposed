@@ -1,24 +1,26 @@
 package com.lody.virtual.server.log
 
 import com.lody.virtual.client.core.VirtualCore
-import com.lody.virtual.remote.logging.LogMessage
+import com.lody.virtual.client.ipc.VLoggingClientAttacher
 import com.lody.virtual.remote.logging.LogMessageHolder
-import com.lody.virtual.server.IVLoggingService
+import com.virtualxposed.log.client.LogMessage
+import com.virtualxposed.log.client.VLoggingClient
+import com.virtualxposed.log.server.IVLoggingService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.onFailure
 import kotlinx.coroutines.launch
-import timber.log.Timber
-import java.io.File
-import kotlin.time.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.format.FormatStringsInDatetimeFormats
 import kotlinx.datetime.format.byUnicodePattern
+import kotlinx.datetime.toLocalDateTime
+import timber.log.Timber
+import java.io.File
+import kotlin.time.Clock
 
 object VLoggingManagerService : IVLoggingService.Stub() {
     init {
@@ -69,11 +71,19 @@ object VLoggingManagerService : IVLoggingService.Stub() {
     fun get() = this
 
     fun log(logMessageHolder: LogMessageHolder) {
+        if (!logMessageHolder.shouldBeDisplayed()) {
+            return
+        }
+
         logChannel.trySend(logMessageHolder).onFailure {
             Timber.e(it, "Failed to send long message to channel!")
         }
 
-        Timber.i("Received log message: ${logMessageHolder.toPrettyJson()}")
+        runCatching {
+            Timber.i("Received log message: ${logMessageHolder.toPrettyJson()}")
+        }.onFailure {
+            Timber.e(it, "Failed to log message")
+        }
     }
 
     override fun log(message: LogMessage?) {

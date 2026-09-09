@@ -54,6 +54,9 @@ import timber.log.Timber;
 
 import static de.robv.android.xposed.XposedBridge.log;
 
+import com.virtualxposed.log.client.LogMessage;
+import com.virtualxposed.log.client.VLoggingClient;
+
 
 public class ExposedBridge {
 
@@ -198,6 +201,8 @@ public class ExposedBridge {
             Timber.e("Module %s does not exist", moduleApkPath);
             return ModuleLoadResult.NOT_EXIST;
         }
+
+        VLoggingClient.get().log(new LogMessage.ModuleLoad(moduleApkPath));
 
         ClassLoader appClassLoaderWithXposed;
         ClassLoader mcl;

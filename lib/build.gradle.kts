@@ -55,12 +55,14 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(project(":exposed-core"))
     implementation(project(":restrictionbypass"))
+    implementation(project(":log-client"))
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.annotation:annotation:1.3.0")
     implementation("com.jakewharton.timber:timber:5.0.1")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.8.0")
+    implementation("com.getkeepsafe.relinker:relinker:1.4.4")
 }
 
 repositories {

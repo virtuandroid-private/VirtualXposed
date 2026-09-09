@@ -1,11 +1,12 @@
-#include <stdio.h>
+#include <cstdio>
 #include <elf.h>
 #include <Jni/Helper.h>
 #include <malloc.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <fb/include/fb/ALog.h>
+#include <cstring>
 #include "SymbolFinder.h"
 
 /* memory map for libraries */
@@ -221,85 +222,65 @@ static symtab_t load_symtab(char *filename) {
 
 
 static int load_memmap(pid_t pid, struct mm *mm, int *nmmp) {
-    size_t buf_size = 0x40000;
-    char *p_buf = (char *) malloc(buf_size); // increase this if needed for larger "maps"
-    char name[MAX_NAME_LEN] = { 0 };
-    char *p;
-    unsigned long start, end;
-    struct mm *m;
+    char path[64];
+    FILE *fp;
+    char *line = NULL;
+    size_t line_len = 0;
     int nmm = 0;
-    int fd, rv;
-    int i;
+    const int max_entries = 4000; // Matches fixed array size in caller
 
-    sprintf(p_buf, "/proc/%d/maps", pid);
-    fd = open(p_buf, O_RDONLY);
-    if (0 > fd) {
-        ALOGE("Can't open %s for reading\n", p_buf);
-        free(p_buf);
+    snprintf(path, sizeof(path), "/proc/%d/maps", pid);
+    fp = fopen(path, "r");
+    if (!fp) {
+        ALOGE("Can't open %s for reading\n", path);
         return -1;
     }
 
-    /* Zero to ensure data is null terminated */
-    memset(p_buf, 0, buf_size);
+    while (getline(&line, &line_len, fp) != -1) {
+        unsigned long start = 0, end = 0;
+        char name[MAX_NAME_LEN] = { 0 };
+        struct mm *m = NULL;
+        int i;
 
-    p = p_buf;
-    while (1) {
-        rv = read(fd, p, buf_size - (p - p_buf));
-        if (0 > rv) {
-            ALOGE("%s read", __FUNCTION__);
-            free(p_buf);
-            return -1;
-        }
-        if (0 == rv)
-            break;
-        p += rv;
-        if (p - p_buf >= buf_size) {
-            ALOGE("Too many memory mapping\n");
-            free(p_buf);
-            return -1;
-        }
-    }
-    close(fd);
-
-    p = strtok(p_buf, "\n");
-    m = mm;
-    while (p) {
-        /* parse current map line */
-        rv = sscanf(p, "%08lx-%08lx %*s %*s %*s %*s %s\n", &start, &end, name);
-
-        p = strtok(NULL, "\n");
-
-        if (rv == 2) {
-            m = &mm[nmm++];
-            m->start = start;
-            m->end = end;
-            memcpy(m->name, MEMORY_ONLY, sizeof(MEMORY_ONLY));
+        int rv = sscanf(line, "%lx-%lx %*s %*s %*s %*s %255s", &start, &end, name);
+        if (rv < 2) {
             continue;
         }
 
-        /* search backward for other mapping with same name */
-        for (i = nmm - 1; i >= 0; i--) {
-            m = &mm[i];
-            if (!strcmp(m->name, name))
-                break;
-        }
-
-        if (i >= 0) {
-            if (start < m->start)
-                m->start = start;
-            if (end > m->end)
-                m->end = end;
-        } else {
-            /* new entry */
+        if (rv == 2 || name[0] == '\0') {
+            if (nmm >= max_entries) break;
             m = &mm[nmm++];
             m->start = start;
             m->end = end;
-            memcpy(m->name, name, strlen(name));
+            snprintf(m->name, sizeof(m->name), "%s", MEMORY_ONLY);
+            continue;
+        }
+
+        for (i = nmm - 1; i >= 0; i--) {
+            if (strcmp(mm[i].name, name) == 0) {
+                m = &mm[i];
+                break;
+            }
+        }
+
+        if (m) {
+            if (start < m->start) m->start = start;
+            if (end > m->end)     m->end = end;
+        } else {
+            if (nmm >= max_entries) {
+                break;
+            }
+            m = &mm[nmm++];
+            m->start = start;
+            m->end = end;
+            snprintf(m->name, sizeof(m->name), "%s", name);
         }
     }
 
+    free(line);
+    fclose(fp);
+
     *nmmp = nmm;
-    free(p_buf);
     return 0;
 }
 
@@ -378,7 +359,7 @@ static int lookup_func_sym(symtab_t s, char *name, unsigned long *val) {
 
 int find_name(pid_t pid, const char *name, const char *libn,
               unsigned long *addr) {
-    struct mm mm[1000] = { 0 };
+    struct mm mm[4000] = { 0 };
     unsigned long libcaddr;
     int nmm;
     char libc[1024] = { 0 };
@@ -394,7 +375,7 @@ int find_name(pid_t pid, const char *name, const char *libn,
         ALOGD("cannot find lib: %s\n", libn);
         return -1;
     }
-    //ALOGD("lib: >%s<\n", libc)
+    ALOGD("lib: >%s<\n", libc);
     s = load_symtab(libc);
     if (!s) {
         ALOGD("cannot read symbol table\n");
@@ -409,7 +390,7 @@ int find_name(pid_t pid, const char *name, const char *libn,
 }
 
 int find_libbase(pid_t pid, const char *libn, unsigned long *addr) {
-    struct mm mm[1000] = { 0 };
+    struct mm mm[4000] = { 0 };
     unsigned long libcaddr;
     int nmm;
     char libc[1024] = { 0 };
