@@ -1,0 +1,18 @@
+package com.virtualxposed.log.client
+
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
+
+@Parcelize
+@Serializable
+enum class LogType : Parcelable {
+    HookAttach,
+    HookExecution,
+    AppLoad,
+    AppKill,
+    ModuleLoad,
+    BroadcastReceived,
+    CodeLoad,
+    FileOpen;
+}
