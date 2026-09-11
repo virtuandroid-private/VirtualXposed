@@ -961,6 +961,19 @@ class MethodProxies {
         }
     }
 
+    static class BindServiceInstance extends BindService {
+        @Override
+        public String getMethodName() {
+            return "bindServiceInstance";
+        }
+
+        @Override
+        public boolean beforeCall(Object who, Method method, Object... args) {
+            return super.beforeCall(who, method, args);
+        }
+    }
+
+
 
     static class StartService extends MethodProxy {
 
