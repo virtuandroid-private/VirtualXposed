@@ -171,6 +171,7 @@ public class MethodInvocationStub<T> {
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             MethodProxy methodProxy = getMethodProxy(method.getName());
+            // System.out.println("Invoke proxy method " + method.getName());
             boolean useProxy = (methodProxy != null && methodProxy.isEnable());
             boolean mightLog = (mInvocationLoggingCondition != LogInvocation.Condition.NEVER) ||
                     (methodProxy != null && methodProxy.getInvocationLoggingCondition() != LogInvocation.Condition.NEVER);

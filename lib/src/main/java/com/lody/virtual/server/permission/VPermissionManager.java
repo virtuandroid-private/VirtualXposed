@@ -38,25 +38,26 @@ public final class VPermissionManager {
 
     // Permissions exceptions
     public static final Set<String> LOCATION_PERMISSIONS = Set.of(
-        Manifest.permission.ACCESS_COARSE_LOCATION,
-        Manifest.permission.ACCESS_FINE_LOCATION,
-        Manifest.permission.ACCESS_BACKGROUND_LOCATION
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_BACKGROUND_LOCATION
     );
     public static final Set<String> BACKGROUND_PERMISSIONS = Set.of(
-        Manifest.permission.ACCESS_BACKGROUND_LOCATION,
-        Manifest.permission.BODY_SENSORS_BACKGROUND
+            Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+            Manifest.permission.BODY_SENSORS_BACKGROUND
     );
     // When key is being granted, value should be too
     public static final Map<String, String> AUTO_GRANT_MAP = Map.of(
-        Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION,
-        Manifest.permission.ACCESS_BACKGROUND_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION,
-        Manifest.permission.BODY_SENSORS_BACKGROUND, Manifest.permission.BODY_SENSORS
+            Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_BACKGROUND_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.BODY_SENSORS_BACKGROUND, Manifest.permission.BODY_SENSORS
     );
 
     private final PermissionCache permissionCache = new PermissionCache(
             VEnvironment.getPermissionFile(), new PermissionFileParser());
 
-    private VPermissionManager() {}
+    private VPermissionManager() {
+    }
 
     public static VPermissionManager get() {
         return INSTANCE;
@@ -104,7 +105,7 @@ public final class VPermissionManager {
      * @return @permission of @type for @uid, or `null` if not declared.
      */
     public @Nullable <T extends Permission> T getPermission(final String permission, final int uid,
-            final Class<T> type) {
+                                                            final Class<T> type) {
 
         return getAppPermissions(uid).getPermission(permission, type);
     }
@@ -130,26 +131,27 @@ public final class VPermissionManager {
 
     /**
      * Check whether @permission of any type is granted for @uid.
-     * @return
-     * - PackageManager.PERMISSION_GRANTED if permission is currently granted
+     *
+     * @return - PackageManager.PERMISSION_GRANTED if permission is currently granted
      * - PackageManager.PERMISSION_DENIED otherwise
      */
     public int checkPermission(final String permission, final int uid) {
-        if (permission == null) {
+        Permission realPermission = getPermission(permission, uid);
+        if (permission == null || realPermission == null) {
             return PERMISSION_DENIED;
         }
-        return getPermission(permission, uid).isGranted()
-            ? PERMISSION_GRANTED
-            : PERMISSION_DENIED;
+        return realPermission.isGranted()
+                ? PERMISSION_GRANTED
+                : PERMISSION_DENIED;
     }
 
     /**
      * @param permission Runtime permission to investigate.
      * @return true if an explanation about why the app needs a particular permission should be
-     *              shown: i.e. the user already denied the permission once (but not permanently).
+     * shown: i.e. the user already denied the permission once (but not permanently).
      */
     public boolean shouldShowRequestPermissionRationale(final String permissionName,
-            final int uid) {
+                                                        final int uid) {
 
         final var permission = getPermission(permissionName, uid, RuntimePermission.class);
         return permission != null && permission.shouldShowRequestPermissionRationale();
@@ -159,7 +161,7 @@ public final class VPermissionManager {
      * Update @permissionName for a specific @uid.
      */
     public void updatePermission(final String permissionName, final int uid,
-            final Consumer<Permission> operation) {
+                                 final Consumer<Permission> operation) {
 
         updatePermission(Permission.class, permissionName, uid, operation);
     }
@@ -168,7 +170,7 @@ public final class VPermissionManager {
      * Update @permissionName of @type for a specific @uid.
      */
     public <T extends Permission> void updatePermission(final Class<T> type,
-            final String permissionName, final int uid, final Consumer<T> operation) {
+                                                        final String permissionName, final int uid, final Consumer<T> operation) {
 
         permissionCache.update(uid, appPermissions -> {
             final var permission = appPermissions.getPermission(permissionName, type);
@@ -182,10 +184,10 @@ public final class VPermissionManager {
                 // Weaker permission should be set to the same exact status as the strong one
                 final var weakPermission = appPermissions.getPermission(
                         AUTO_GRANT_MAP.get(permissionName), RuntimePermission.class);
-                if (!weakPermission.isGranted() || strongPermission.getStatus() == Status.GRANTED) {
+                if (weakPermission != null && (!weakPermission.isGranted() || strongPermission.getStatus() == Status.GRANTED)) {
                     // Update weak permission to match stronger one
                     appPermissions.updatePermission(new RuntimePermission(weakPermission.getName(),
-                                weakPermission.getPermissionGroup(), strongPermission));
+                            weakPermission.getPermissionGroup(), strongPermission));
                 }
             }
             if (AUTO_GRANT_MAP.containsValue(permissionName)
@@ -197,7 +199,7 @@ public final class VPermissionManager {
                     }
                     final var strongPermission = appPermissions.getPermission(
                             strongPermissionName, RuntimePermission.class);
-                    if (strongPermission.isGranted()) {
+                    if (strongPermission != null && strongPermission.isGranted()) {
                         strongPermission.setDeniedOnce();
                     }
                 });
@@ -213,11 +215,11 @@ public final class VPermissionManager {
             permission.setStatus(Status.GRANTED);
             if (permission instanceof PermissionGroup permissionGroup) {
                 permissionGroup.getPermissions().stream()
-                    .filter(runtimePermission -> !runtimePermission.isOverridden())
-                    .forEach(runtimePermission -> {
-                        // When granting a group, grant all permissions inside of it
-                        runtimePermission.setStatus(Status.GRANTED);
-                    });
+                        .filter(runtimePermission -> !runtimePermission.isOverridden())
+                        .forEach(runtimePermission -> {
+                            // When granting a group, grant all permissions inside of it
+                            runtimePermission.setStatus(Status.GRANTED);
+                        });
             }
         });
     }
@@ -246,11 +248,11 @@ public final class VPermissionManager {
                 // This allows to permissions to display the dialog, which is lines up with Android
                 permissionGroup.setStatus(Status.UNREQUESTED);
                 permissionGroup.getPermissions().stream()
-                    .filter(runtimePermission -> !runtimePermission.isOverridden())
-                    .forEach(runtimePermission -> {
-                        // Set all (non-overridden) runtime permissions in the group as denied once
-                        runtimePermission.setDeniedOnce();
-                    });
+                        .filter(runtimePermission -> !runtimePermission.isOverridden())
+                        .forEach(runtimePermission -> {
+                            // Set all (non-overridden) runtime permissions in the group as denied once
+                            runtimePermission.setDeniedOnce();
+                        });
             } else if (permission instanceof RuntimePermission runtimePermission) {
                 // Check if permission had been denied once
                 if (runtimePermission.shouldShowRequestPermissionRationale()) {
@@ -271,9 +273,9 @@ public final class VPermissionManager {
         final var groupFuture = new CompletableFuture<String>();
         final var ctx = VirtualCore.get().getContext();
         ctx.getPackageManager()
-            .getGroupOfPlatformPermission(permission, ctx.getMainExecutor(), group -> {
-                groupFuture.complete(group);
-            });
+                .getGroupOfPlatformPermission(permission, ctx.getMainExecutor(), group -> {
+                    groupFuture.complete(group);
+                });
         try {
             return groupFuture.get();
         } catch (ExecutionException | InterruptedException e) {
@@ -295,20 +297,20 @@ public final class VPermissionManager {
             int protection;
             try {
                 protection = VirtualCore.get()
-                    .getPM()
-                    .getPermissionInfo(permissionName, 0)
-                    .getProtection();
+                        .getPM()
+                        .getPermissionInfo(permissionName, 0)
+                        .getProtection();
             } catch (PackageManager.NameNotFoundException e) {
                 VLog.w(TAG, "Permission not found: %s", permissionName);
                 // Unknown permissions are treated as denied install-time permissions
                 appPermissions.put(permissionName, new InstallPermission(
-                            permissionName, Status.DENIED));
+                        permissionName, Status.DENIED));
                 return;
             }
 
             final var permission = switch (protection) {
                 case PermissionInfo.PROTECTION_NORMAL ->
-                    new InstallPermission(permissionName, Status.GRANTED);
+                        new InstallPermission(permissionName, Status.GRANTED);
                 case PermissionInfo.PROTECTION_DANGEROUS -> {
                     final var groupName = getPermissionGroup(permissionName);
                     if (groupName == null

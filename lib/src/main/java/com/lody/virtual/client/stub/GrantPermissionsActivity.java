@@ -108,7 +108,8 @@ public class GrantPermissionsActivity extends Activity {
         if (VPermissionManager.AUTO_GRANT_MAP.containsKey(permissionName)) {
             final var weakPermission = permissionManager.getPermission(
                     VPermissionManager.AUTO_GRANT_MAP.get(permissionName), uid);
-            if (!weakPermission.isGranted()) {
+
+            if (weakPermission != null && !weakPermission.isGranted()) {
                 setGrantResult(permissionManager.checkPermission(permissionName, uid));
                 return;
             }
@@ -285,7 +286,7 @@ public class GrantPermissionsActivity extends Activity {
         }
         final var coarseLocation = permissionManager.getPermission(COARSE_LOCATION, uid,
                 RuntimePermission.class);
-        if (permissionName.equals(FINE_LOCATION) && coarseLocation.isGranted()) {
+        if (permissionName.equals(FINE_LOCATION) && coarseLocation != null && coarseLocation.isGranted()) {
             final var locationChangeMessage = getString(
                     R.string.location_change_request_dialog_message, appName);
             messageView.setText(Html.fromHtml(locationChangeMessage));

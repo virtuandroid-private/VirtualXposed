@@ -638,7 +638,8 @@ void IOUniformer::startUniformer(const char *so_path, int api_level, int preview
         HOOK_SYMBOL(handle, __open_2);
 #endif
         HOOK_SYMBOL(handle, openat);
-        HOOK_SYMBOL(handle, __openat_2);
+        // __openat_2 hooking causes webview crashes!
+        // HOOK_SYMBOL(handle, __openat_2);
         HOOK_SYMBOL(handle, fchownat);
         HOOK_SYMBOL(handle, renameat);
         HOOK_SYMBOL(handle, fstatat64);

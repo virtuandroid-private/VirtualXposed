@@ -187,7 +187,10 @@ public class ExposedBridge {
             return ModuleLoadResult.IGNORED;
         }
 
-        final String rootDir = new File(currentApplicationInfo.dataDir).getParent();
+        final String userRoot = new File(currentApplicationInfo.dataDir).getParentFile().getParent();
+        // Always load modules from user 0 config, since Xposed installer is not clonable
+        final String rootDir = userRoot + "/0/";
+
         loadModuleConfig(rootDir, currentApplicationInfo.processName);
 
         if (lastModuleList.second == null || !lastModuleList.second.contains(moduleApkPath)) {

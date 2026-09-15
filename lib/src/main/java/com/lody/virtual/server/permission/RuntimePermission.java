@@ -110,6 +110,9 @@ public class RuntimePermission extends Permission {
 
     @Override
     public boolean isGranted() {
+        if (group == null) {
+            return false;
+        }
         return switch (status) {
             case Status.GRANTED -> isOverridden() || group.isGranted();
             case Status.ALWAYS_ASK -> isGrantedOnce()
@@ -189,6 +192,7 @@ public class RuntimePermission extends Permission {
      * @return true if the permission request dialog needs to be displayed.
      */
     public boolean needsRequestDialog() {
+        if (group == null) return !isGranted();
         return switch (status) {
             case Status.UNREQUESTED -> isOverridden() || !group.isGranted();
             case Status.DENIED -> false;

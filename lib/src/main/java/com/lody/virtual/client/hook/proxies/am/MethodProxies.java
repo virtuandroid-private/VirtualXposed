@@ -1200,6 +1200,13 @@ class MethodProxies {
     }
 
 
+    static class CheckPermissionDevice extends CheckPermission {
+        @Override
+        public String getMethodName() {
+            return "checkPermissionForDevice";
+        }
+    }
+
     static class CheckPermission extends MethodProxy {
 
         private static final String TAG = CheckPermission.class.getSimpleName();
